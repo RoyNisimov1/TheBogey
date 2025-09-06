@@ -9,6 +9,7 @@ class COLORS:
     BG_RED = (194, 94, 87)
 
     BG_COLORS = [BG_GREEN, BG_ORANGE, BG_CYAN, BG_YELLOW, BG_BLUE, BG_RED]
+
     @staticmethod
     def lerp_color(color1, color2, t):
 
