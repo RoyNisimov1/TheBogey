@@ -30,12 +30,15 @@ decks = []
 firstCard = draw_deck.draw_card()
 in_hand = Deck([])
 discard_deck = Deck([])
+
+#dragability
+currently_dragging = None
+start_drag = [0, 0]
+
+
+
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_ESCAPE]: running = False
+
 
     # SCREEN COLOR LERP
     screen_color = COLORS.lerp_colors(BG_C, t)
@@ -59,8 +62,25 @@ while running:
         dir *= -1
     screen.fill(screen_color)
 
-    # GAME
     mouse_pos = pygame.mouse.get_pos()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEMOTION:
+            if currently_dragging is not None:
+                currently_dragging.set_pos([mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2])
+                currently_dragging.update(screen)
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                currently_dragging.set_pos(start_drag)
+                currently_dragging = None
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_ESCAPE]: running = False
+
+    # GAME
+
     # Makes sure there are enough cards:
     if len(draw_deck) >= 5:
         # combine discard and draw deck and reshuffle
@@ -79,13 +99,21 @@ while running:
         for _ in range(5 - len(in_hand)):
             in_hand.add_card(draw_deck.draw_card())
 
-    in_hand.draw_deck(screen, [current_w // 2 - 525, current_h - 300], 10)
-
-    for i in range(5):
+    poses = in_hand.draw_deck([current_w // 2 - 525, current_h - 300], 10)
+    mouse_buttons = pygame.mouse.get_pressed()
+    for i in range(len(in_hand)):
         card = in_hand.deck[i]
-        if card.get_rect().collidepoint(mouse_pos):
+        if card == currently_dragging:
+            card.update(screen)
+            continue
+        card.set_pos(poses[i])
+        if card.get_rect().collidepoint(mouse_pos) and currently_dragging is None:
             card.set_pos([card.x, card.y - 15])
+            if mouse_buttons[0]:
+                currently_dragging = card
+                start_drag = [card.x, card.y]
         card.update(screen)
+
 
 
     pygame.display.flip()

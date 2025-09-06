@@ -1,6 +1,10 @@
 import pygame
 
 class Card:
+
+    WIDTH = 200
+    HEIGHT = 280
+
     def __init__(self, value: int, suit: int, pos: list[int] = None):
         assert 0 <= suit <= 3
         # Suit will be CHaSeD order:

@@ -25,10 +25,8 @@ class Deck:
     def add_card(self, card: Card):
         self.deck.append(card)
 
-    def draw_deck(self, screen, start_pos, space, card_size = 200):
-        for i, c in enumerate(self.deck):
-            pos = [start_pos[0] + i * (card_size + space), start_pos[1]]
-            c.set_pos(pos)
+    def draw_deck(self, start_pos, space, card_size = Card.WIDTH):
+        return [(start_pos[0] + i * (card_size + space), start_pos[1]) for i in range(len(self.deck))]
 
     def clear(self):
         self.deck = []
