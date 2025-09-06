@@ -60,18 +60,32 @@ while running:
     screen.fill(screen_color)
 
     # GAME
+    mouse_pos = pygame.mouse.get_pos()
     # Makes sure there are enough cards:
     if len(draw_deck) >= 5:
-        ... # combine discard and draw deck and reshuffle
+        # combine discard and draw deck and reshuffle
+        draw_deck.add_cards(discard_deck.deck)
+        discard_deck.clear()
+        draw_deck.shuffle_deck()
+
+    if len(draw_deck) == 0:
+        running = False
+        print("IMPLEMENT FINISH CONDITION")
 
     # Draw cards up to 5
-    if not is_bogey_turn and len(in_hand) < 5:
+    if is_bogey_turn:
+        ...
+    elif len(in_hand) < 5:
         for _ in range(5 - len(in_hand)):
             in_hand.add_card(draw_deck.draw_card())
 
     in_hand.draw_deck(screen, [current_w // 2 - 525, current_h - 300], 10)
 
-
+    for i in range(5):
+        card = in_hand.deck[i]
+        if card.get_rect().collidepoint(mouse_pos):
+            card.set_pos([card.x, card.y - 15])
+        card.update(screen)
 
 
     pygame.display.flip()

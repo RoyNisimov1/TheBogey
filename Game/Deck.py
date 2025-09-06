@@ -27,8 +27,14 @@ class Deck:
 
     def draw_deck(self, screen, start_pos, space, card_size = 200):
         for i, c in enumerate(self.deck):
-            c.draw(screen, [start_pos[0] + i * (card_size + space), start_pos[1]])
+            pos = [start_pos[0] + i * (card_size + space), start_pos[1]]
+            c.set_pos(pos)
 
+    def clear(self):
+        self.deck = []
+
+    def add_cards(self, cards: list[Card]):
+        self.deck.extend(cards)
 
     def __len__(self):
         return len(self.deck)
