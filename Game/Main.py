@@ -1,6 +1,6 @@
 import pygame
-import random
 
+from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
 from Game.Deck import Deck
 from Game.Color import COLORS
@@ -16,11 +16,7 @@ running: bool = True
 clock = pygame.time.Clock()
 fps: int = 60
 delta_time: float = 0.1
-#BG Colors
-t = 0.0
-direction = delta_time / fps
-dir = 1
-BG_C = COLORS.BG_COLORS.copy()
+
 
 # Game related
 draw_deck = Deck(Deck.get_new_deck())
@@ -30,37 +26,19 @@ decks = []
 firstCard = draw_deck.draw_card()
 in_hand = Deck([])
 discard_deck = Deck([])
-
+card_speed = 20
 #dragability
 currently_dragging = None
-start_drag = [0, 0]
+start_drag_index = 0
 
-
-
+color_bg_sys = COLORS(fps)
 while running:
 
 
     # SCREEN COLOR LERP
-    screen_color = COLORS.lerp_colors(BG_C, t)
-    t += direction
-    if screen_color in BG_C:
-        old_color_index = 0
-        direction = delta_time / (fps * 100) * dir
-        for i, c in enumerate(BG_C):
-            if c == screen_color:
-                old_color_index = i
-                break
-        random.shuffle(BG_C)
-        for i, c in enumerate(BG_C):
-            if c == screen_color:
-                BG_C[i] = BG_C[old_color_index]
-                BG_C[old_color_index] = screen_color
-    else:
-        direction = delta_time / fps * dir
 
-    if t >= 1.0 or t <= 0.0:
-        dir *= -1
-    screen.fill(screen_color)
+    c = color_bg_sys.update(delta_time)
+    screen.fill(c)
 
     mouse_pos = pygame.mouse.get_pos()
     for event in pygame.event.get():
@@ -73,7 +51,7 @@ while running:
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                currently_dragging.set_pos(start_drag)
+                in_hand.add_card_index(currently_dragging, start_drag_index)
                 currently_dragging = None
 
     keys = pygame.key.get_pressed()
@@ -95,26 +73,38 @@ while running:
     # Draw cards up to 5
     if is_bogey_turn:
         ...
-    elif len(in_hand) < 5:
+    elif len(in_hand) < 5 and currently_dragging is None:
         for _ in range(5 - len(in_hand)):
             in_hand.add_card(draw_deck.draw_card())
 
-    poses = in_hand.draw_deck([current_w // 2 - 525, current_h - 300], 10)
+    space = 10
+    poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * len(in_hand) * 0.5, current_h - 300], space)
     mouse_buttons = pygame.mouse.get_pressed()
     for i in range(len(in_hand)):
         card = in_hand.deck[i]
         if card == currently_dragging:
-            card.update(screen)
             continue
-        card.set_pos(poses[i])
+
+        if currently_dragging is None:
+            l = LerpFuncs.LERPPos(card.get_pos(), poses[i], delta_time * card_speed)
+            #l = poses[i]
+            card.set_pos(l)
+
         if card.get_rect().collidepoint(mouse_pos) and currently_dragging is None:
-            card.set_pos([card.x, card.y - 15])
+            l = LerpFuncs.LERPPos(card.get_pos(), [poses[i][0], poses[i][1] - 15], delta_time * card_speed * 0.5)
+            #l = [poses[i][0], poses[i][1] - 50]
+            card.set_pos(l)
             if mouse_buttons[0]:
                 currently_dragging = card
-                start_drag = [card.x, card.y]
-        card.update(screen)
+                start_drag_index = i
 
+    if currently_dragging is not None and len(in_hand) == 5:
+        in_hand.remove(start_drag_index)
 
+    for card in in_hand.deck:
+        if card is not None:
+            card.update(screen)
+    if currently_dragging is not None: currently_dragging.update(screen)
 
     pygame.display.flip()
 

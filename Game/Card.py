@@ -27,7 +27,7 @@ class Card:
         self.x = pos[0]
         self.y = pos[1]
 
-    def draw(self, screen: pygame.display, pos: list[int] = None):
+    def draw(self, screen: pygame.Surface, pos: list[int] = None):
         if pos is None: pos = [self.x, self.y]
         screen.blit(self.surface, pos)
 
@@ -39,13 +39,15 @@ class Card:
         pos = [self.x, self.y]
         screen.blit(self.surface, pos)
 
+    def get_pos(self):
+        return [self.x, self.y]
 
     def get_rect(self):
         return self.surface.get_rect(topleft=(self.x, self.y))
 
     def load_surface(self) -> pygame.Surface:
         # Card aspect ratio is 2.5/3.5
-        s = pygame.Surface([200, 280])
+        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
         s.fill((255, 255, 255))
         font = pygame.font.Font('freesansbold.ttf', 32)
         text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
