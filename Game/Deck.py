@@ -15,7 +15,9 @@ class Deck:
         cards: list[Card] = []
         for s in range(4):
             for v in range(1, 13):
-                cards.append(Card(v, s))
+                c = Card(v, s)
+                c.set_pos([0,2])
+                cards.append(c)
         return cards.copy()
 
     def shuffle_deck(self):
@@ -31,7 +33,11 @@ class Deck:
         self.deck.insert(index, card)
 
     def draw_deck(self, start_pos, space, card_size=Card.WIDTH):
-        return [(start_pos[0] + i * (card_size + space), start_pos[1]) for i in range(len(self.deck))]
+        n_nones = 0
+        for i in self.deck:
+            if i is None:
+                n_nones +=1
+        return [(start_pos[0] + i * (card_size + space), start_pos[1]) for i in range(len(self.deck) - n_nones)]
 
     def clear(self):
         self.deck = []
