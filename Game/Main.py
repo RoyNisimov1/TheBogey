@@ -26,7 +26,15 @@ delta_time: float = 0.1
 draw_deck = Deck(Deck.get_new_deck())
 draw_deck.shuffle_deck()
 is_bogey_turn = False
+space_between_decks = [20, 30]
+decks_start_pos = [(current_w - (space_between_decks[0] + Card.WIDTH) * 6) / 2, 30]
 decks = []
+for i in range(12):
+    pos = [decks_start_pos[0] + (space_between_decks[0] + Card.WIDTH) * i, decks_start_pos[1]]
+    if i > 5:
+        pos = [decks_start_pos[0] + (space_between_decks[0] + Card.WIDTH) * (i-6), decks_start_pos[1] + space_between_decks[1] + Card.HEIGHT]
+    decks.append(Deck([], pos))
+
 firstCard = draw_deck.draw_card()
 in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
@@ -35,9 +43,7 @@ space = 10
 draw_cards = True
 cards_in_place = 0
 
-#dragability
 
-start_drag_index = 0
 
 color_bg_sys = COLORS(fps)
 
@@ -102,9 +108,13 @@ while running:
 
 
 
+    for deck in decks:
+        deck.gyzmos(screen)
+
     for card in in_hand.deck:
         if card is not None:
             card.update(screen, delta_time)
+
 
 
     pygame.display.flip()

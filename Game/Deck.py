@@ -33,6 +33,13 @@ class Deck:
     def add_card_index(self, card: Card, index: int):
         self.deck.insert(index, card)
 
+    def gyzmos(self, screen):
+        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+        s.fill((0, 0, 0))
+        pos = self.start_pos
+        screen.blit(s, pos)
+
+
     def draw_deck(self, start_pos, space, card_size=Card.WIDTH):
         poses = []
         j = 0
