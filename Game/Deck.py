@@ -35,8 +35,7 @@ class Deck:
         self.deck.insert(index, card)
 
     def gyzmos(self, screen):
-        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
-        s.fill((0, 0, 0))
+        s = self.get_top_card_surface()
         pos = self.start_pos
         screen.blit(s, pos)
 
@@ -101,6 +100,16 @@ class Deck:
             if mouse_buttons_release[0]:
                 succeeded = self.on_mouse_release()
         return succeeded
+
+
+    def get_top_card_surface(self):
+        if len(self.deck) == 0:
+            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+            s.fill((0, 0, 0))
+            return s
+        s = self.deck[len(self.deck)-1].surface
+        return s
+
 
 
     def get_len_not_active(self):
