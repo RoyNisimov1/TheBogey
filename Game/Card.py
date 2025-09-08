@@ -59,28 +59,33 @@ class Card:
         if not GLOBAL().get_is_active():
             self.active = True
             GLOBAL().set_is_active(True)
+            GLOBAL().set_current(self)
         return
 
     def on_mouse_release(self):
         self.active = False
         GLOBAL().set_is_active(False)
+        GLOBAL().set_current(None)
+
         return
 
-    def on_hover_exit(self):
-        return
 
+    def __eq__(self, other):
+        if not isinstance(other, Card):
+            return False
+        return self.suit == other.suit and self.value == other.value
 
     def update(self, screen, delta_time=0.1):
         self.delta_time = delta_time
         mouse_pos = pygame.mouse.get_pos()
         mouse_buttons = pygame.mouse.get_pressed()
-
+        mouse_buttons_release = pygame.mouse.get_just_released()
         if self.get_rect().collidepoint(mouse_pos):
             self.on_mouse_hover()
             if mouse_buttons[0]:
                 self.on_mouse_click()
-        else:
-            self.on_hover_exit()
+            if mouse_buttons_release[0]:
+                self.on_mouse_release()
 
         pos = self.get_pos()
         screen.blit(self.surface, pos)

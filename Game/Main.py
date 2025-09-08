@@ -62,11 +62,7 @@ while running:
             running = False
 
 
-        if event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                for card in in_hand.deck:
-                    if card.active:
-                        card.on_mouse_release()
+
 
 
 
@@ -105,6 +101,15 @@ while running:
         card.set_pos(l, 1)
         if card.active:
             card.set_pos([mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], 3)
+
+    for i, deck in enumerate(decks):
+        succeeded = deck.check_mouse_events()
+        if succeeded:
+            in_hand.remove_card_data(GLOBAL().current)
+            GLOBAL().current.active = False
+            GLOBAL().set_current(None)
+            GLOBAL().set_is_active(False)
+
 
 
 

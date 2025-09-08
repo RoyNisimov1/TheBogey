@@ -3,6 +3,7 @@ import random
 import pygame
 import LerpFuncs
 from Card import Card
+from Game.GLOBAL import GLOBAL
 
 
 class Deck:
@@ -50,6 +51,56 @@ class Deck:
             poses.append([start_pos[0] + j * (card_size + space), start_pos[1]])
             j += 1
         return poses
+
+    def get_rect(self):
+        return pygame.Rect([self.start_pos[0], self.start_pos[1], Card.WIDTH, Card.HEIGHT])
+
+    def on_mouse_hover(self):
+        ...
+
+    def can_add_card(self, card: Card):
+        if len(self.deck) == 0: return True
+        top_card = self.deck[len(self.deck)-1]
+        if top_card.suit != card.suit: return False
+        if top_card.value < card.value: return False
+        return True
+
+
+    def on_mouse_click(self):
+        ...
+
+    def remove_card_data(self, card: Card):
+        i = 0
+        found_card = False
+        for c in range(len(self.deck)):
+            if self.deck[c] == card:
+                i = c
+                found_card = True
+        if found_card:
+            self.remove(i)
+
+    def on_mouse_release(self):
+
+        if not GLOBAL().get_is_active() or GLOBAL().get_current() is None: return False
+        card: Card = GLOBAL().get_current()
+        if not self.can_add_card(card):
+            return False
+        self.add_card(card)
+        return True
+
+    def check_mouse_events(self):
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_buttons = pygame.mouse.get_pressed()
+        mouse_buttons_release = pygame.mouse.get_just_released()
+
+        succeeded = False
+        if self.get_rect().collidepoint(mouse_pos):
+            self.on_mouse_hover()
+            if mouse_buttons[0]:
+                self.on_mouse_click()
+            if mouse_buttons_release[0]:
+                succeeded = self.on_mouse_release()
+        return succeeded
 
 
     def get_len_not_active(self):
