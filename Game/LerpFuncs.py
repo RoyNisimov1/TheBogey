@@ -1,11 +1,17 @@
+import math
+
 import pygame
 
 class LerpFuncs():
 
     @staticmethod
     def LERPPos(start_pos: list[int], end_pos: list[int], speed: float = 0.1) -> list[float]:
+        #speed = max(0.0, min(1.0, speed))
         x = start_pos[0] + (end_pos[0] - start_pos[0]) * speed
         y = start_pos[1] + (end_pos[1] - start_pos[1]) * speed
+        if math.ceil(x) == end_pos[0] and math.ceil(y) == end_pos[1]:
+
+            return end_pos
         return [x, y].copy()
 
 

@@ -2,6 +2,7 @@ import math
 
 import pygame
 
+from Game.GLOBAL import GLOBAL
 from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
 from Game.Deck import Deck
@@ -13,6 +14,7 @@ current_w, current_h = infoObject.current_w, infoObject.current_h
 
 
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+pygame.display.set_caption("The Bogey")
 
 running: bool = True
 clock = pygame.time.Clock()
@@ -26,7 +28,7 @@ draw_deck.shuffle_deck()
 is_bogey_turn = False
 decks = []
 firstCard = draw_deck.draw_card()
-in_hand = Deck([])
+in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 base_speed = 20
 space = 10
@@ -37,10 +39,10 @@ cards_in_place = 0
 
 start_drag_index = 0
 
-def roughly_eq(a, b):
-    return math.floor(a[0]) + 1 == b[0] and math.floor(a[1]) + 1 == b[1]
 color_bg_sys = COLORS(fps)
+
 while running:
+
     card_speed = base_speed*delta_time
 
     # SCREEN COLOR LERP
@@ -52,16 +54,13 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.MOUSEMOTION:
-            for card in in_hand.deck:
-                if card.active:
-                    card.set_pos([mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2])
-                    card.update(screen)
+
 
         if event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
                 for card in in_hand.deck:
-                    card.on_mouse_release()
+                    if card.active:
+                        card.on_mouse_release()
 
 
 
@@ -86,19 +85,20 @@ while running:
         ...
     elif draw_cards:
         for _ in range(5 - len(in_hand)):
-            in_hand.add_card(draw_deck.draw_card())
+            c = draw_deck.draw_card()
+            c.set_pos(in_hand.start_pos)
+            in_hand.add_card(c)
         draw_cards = False
 
-    if cards_in_place < 5:
-        poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * len(in_hand) * 0.5, current_h - 300], space)
-        for i in range(len(in_hand)):
-            card = in_hand.deck[i]
-            card.rest_pos = poses[i]
-            l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
-            card.set_pos(l)
-            if roughly_eq(l, poses[i]):
-                card.set_pos(poses[i])
-                cards_in_place += 1
+
+    poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space)
+    for i in range(len(in_hand)):
+        card = in_hand.deck[i]
+        card.rest_pos = poses[i]
+        l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
+        card.set_pos(l, 1)
+        if card.active:
+            card.set_pos([mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], 3)
 
 
 

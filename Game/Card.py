@@ -8,7 +8,7 @@ class Card:
     WIDTH = 200
     HEIGHT = 280
 
-    def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos = None,speed = 20):
+    def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos = None,speed = 5):
         assert 0 <= suit <= 3
         # Suit will be CHaSeD order:
         #   0: Clubs
@@ -30,9 +30,11 @@ class Card:
         self.x = pos[0]
         self.y = pos[1]
         self.speed = speed
-        if (rest_pos is None): rest_pos = [0,0]
+        if rest_pos is None:
+            rest_pos = [0, 0]
         self.rest_pos = rest_pos
         self.delta_time = 0.1
+        self.priority = 0
 
     def set_active(self, v: bool):
         self.active = v
@@ -41,30 +43,30 @@ class Card:
         if pos is None: pos = [self.x, self.y]
         screen.blit(self.surface, pos)
 
-    def set_pos(self, pos: list[int]):
+    def set_pos(self, pos: list[int], priority: int = 0):
+        if priority < self.priority: return
         self.x = pos[0]
         self.y = pos[1]
+        self.priority = priority
 
 
     def on_mouse_hover(self):
-        if not self.active:
-            self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]-15], self.speed*self.delta_time))
+        if not GLOBAL().get_is_active():
+            self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]-30], self.speed*self.delta_time), 2)
         return
 
     def on_mouse_click(self):
-        if not GLOBAL().isCardActive:
+        if not GLOBAL().get_is_active():
             self.active = True
-            GLOBAL().isCardActive = True
+            GLOBAL().set_is_active(True)
         return
 
     def on_mouse_release(self):
         self.active = False
-        GLOBAL().isCardActive = False
+        GLOBAL().set_is_active(False)
         return
 
     def on_hover_exit(self):
-        self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]], self.speed*self.delta_time))
-
         return
 
 
@@ -82,6 +84,8 @@ class Card:
 
         pos = self.get_pos()
         screen.blit(self.surface, pos)
+        self.priority = 0
+
 
     def get_pos(self):
         return [self.x, self.y]
