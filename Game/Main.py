@@ -7,6 +7,7 @@ from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
 from Game.Deck import Deck
 from Game.Color import COLORS
+from Button import Button
 
 pygame.init()
 infoObject = pygame.display.Info()
@@ -38,7 +39,7 @@ for i in range(12):
 firstCard = draw_deck.draw_card()
 in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
-base_speed = 20
+base_speed = 10
 space = 10
 draw_cards = True
 cards_in_place = 0
@@ -46,6 +47,9 @@ cards_in_place = 0
 
 
 color_bg_sys = COLORS(fps)
+
+
+
 
 while running:
 
@@ -126,7 +130,7 @@ while running:
 
     delta_time = clock.tick(fps) / 1000
     delta_time = max(0.001, min(0.1, delta_time))
-
+    GLOBAL().update_mouse(delta_time)
 pygame.quit()
 
 

@@ -8,7 +8,7 @@ class Card:
     WIDTH = 200
     HEIGHT = 280
 
-    def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos = None,speed = 5):
+    def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos=None, speed=5):
         assert 0 <= suit <= 3
         # Suit will be CHaSeD order:
         #   0: Clubs
@@ -56,11 +56,7 @@ class Card:
         return
 
     def on_mouse_click(self):
-        if not GLOBAL().get_is_active():
-            self.active = True
-            GLOBAL().set_is_active(True)
-            GLOBAL().set_current(self)
-        return
+        ...
 
     def on_mouse_release(self):
         self.active = False
@@ -69,6 +65,12 @@ class Card:
 
         return
 
+    def on_mouse_hold(self):
+        if not GLOBAL().get_is_active():
+            self.active = True
+            GLOBAL().set_is_active(True)
+            GLOBAL().set_current(self)
+        return
 
     def __eq__(self, other):
         if not isinstance(other, Card):
@@ -83,7 +85,14 @@ class Card:
         if self.get_rect().collidepoint(mouse_pos):
             self.on_mouse_hover()
             if mouse_buttons[0]:
-                self.on_mouse_click()
+                move = False
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEMOTION:
+                        self.on_mouse_hold()
+                        move = True
+                        break
+                if GLOBAL().time_held < 0.2 and not move:
+                    self.on_mouse_click()
             if mouse_buttons_release[0]:
                 self.on_mouse_release()
 

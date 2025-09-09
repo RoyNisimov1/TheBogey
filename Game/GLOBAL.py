@@ -1,3 +1,4 @@
+import pygame
 
 
 class GLOBAL:
@@ -10,6 +11,7 @@ class GLOBAL:
             cls._instance = super().__new__(cls)
             cls._instance.is_card_active = False
             cls._instance.current = None
+            cls._instance.time_held = 0.0
         return cls._instance
 
     def set_is_active(self, v: bool):
@@ -23,3 +25,9 @@ class GLOBAL:
 
     def get_current(self):
         return self.current
+
+    def update_mouse(self, delta_time: float):
+        mouse_buttons = pygame.mouse.get_pressed()
+        if mouse_buttons[0]: self.time_held += delta_time
+        else:
+            self.time_held = 0
