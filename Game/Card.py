@@ -35,6 +35,8 @@ class Card:
         self.rest_pos = rest_pos
         self.delta_time = 0.1
         self.priority = 0
+        self.selected = False
+        self.clicked = False
 
     def set_active(self, v: bool):
         self.active = v
@@ -70,6 +72,7 @@ class Card:
             self.active = True
             GLOBAL().set_is_active(True)
             GLOBAL().set_current(self)
+            self.selected = False
         return
 
     def __eq__(self, other):
@@ -86,15 +89,21 @@ class Card:
             self.on_mouse_hover()
             if mouse_buttons[0]:
                 move = False
+
                 for event in pygame.event.get():
                     if event.type == pygame.MOUSEMOTION:
                         self.on_mouse_hold()
                         move = True
+
                         break
                 if GLOBAL().time_held < 0.2 and not move:
                     self.on_mouse_click()
+                    if not self.clicked:
+                        self.selected = not self.selected
+                        self.clicked = True
             if mouse_buttons_release[0]:
                 self.on_mouse_release()
+                self.clicked = False
 
         pos = self.get_pos()
         screen.blit(self.surface, pos)

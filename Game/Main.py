@@ -39,18 +39,27 @@ for i in range(12):
 firstCard = draw_deck.draw_card()
 in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
+save_deck = []
 base_speed = 10
 space = 10
 draw_cards = True
 cards_in_place = 0
-
+clicked_button = False
 
 
 color_bg_sys = COLORS(fps)
 
 
+b = Button(text="Keep Cards", font_size=10)
+
+def save_later_wrapper():
+    for card in in_hand.deck:
+        if card.selected:
+            save_deck.append(card)
+    return True
 
 
+b.set_f(save_later_wrapper)
 while running:
 
     card_speed = base_speed*delta_time
@@ -64,10 +73,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-
-
-
 
 
     keys = pygame.key.get_pressed()
@@ -86,6 +91,13 @@ while running:
         running = False
         print("IMPLEMENT FINISH CONDITION")
 
+    if clicked_button and not is_bogey_turn:
+        discard_deck.add_cards(in_hand.deck.copy())
+        in_hand.clear()
+        in_hand.add_card(draw_deck.draw_card())
+        is_bogey_turn = True
+
+
     # Draw cards up to 5
     if is_bogey_turn:
         ...
@@ -95,6 +107,8 @@ while running:
             c.set_pos(in_hand.start_pos)
             in_hand.add_card(c)
         draw_cards = False
+
+
 
 
     poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space)
@@ -114,7 +128,8 @@ while running:
             GLOBAL().set_current(None)
             GLOBAL().set_is_active(False)
 
-
+    if not is_bogey_turn:
+        clicked_button = b.update(screen)
 
 
     for deck in decks:

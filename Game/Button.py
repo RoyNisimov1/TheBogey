@@ -4,17 +4,16 @@ import pygame
 class Button:
 
     @staticmethod
-    def void_func_wrapper():
+    def void_func_wrapper(*args, **kwargs):
         return
 
-    def __init__(self, pos=None, text="", font=None, f=void_func_wrapper, bg_sprite = None, size=None):
+    def __init__(self, pos=None, text="", font="freesansbold.ttf", font_size=32, f=void_func_wrapper, bg_sprite = None, size=None):
         self.bg_sprite: pygame.Surface = bg_sprite
 
         if size is None:
             size = [50, 30]
         self.size = size
-        if font is None:
-            font = ["freesansbold.ttf", 32]
+        self.font_size = font_size
         if pos is None: pos = [0, 0]
         self.pos = pos
         self.text = text
@@ -22,22 +21,27 @@ class Button:
         self.font = font
         self.clicked = False
 
-    def update(self, screen: pygame.Surface):
+    def set_f(self, f):
+        self.function = f
+
+    def update(self, screen: pygame.Surface, *args, **kwargs):
         if self.bg_sprite is None:
             s = pygame.Surface(self.size)
             s.fill((255, 255, 255))
         else:
             s = self.bg_sprite
-        font = pygame.font.Font(self.font[0], self.font[1])
+        font = pygame.font.Font(self.font, self.font_size)
         text = font.render(self.text, True, (0, 0, 0))
-        s.blit(text, [100, 140])
+        s.blit(text, [self.size[0]//2, self.size[1]//2])
         mouse_pos = pygame.mouse.get_pos()
+        r = None
         if self.get_rect().collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-                self.function()
+                r = self.function(*args, **kwargs)
                 self.clicked = True
         if pygame.mouse.get_pressed()[0] == 0: self.clicked = False
         screen.blit(s)
+        return r
 
     def get_rect(self):
         if self.bg_sprite is not None:
