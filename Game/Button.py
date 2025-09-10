@@ -32,15 +32,20 @@ class Button:
             s = self.bg_sprite
         font = pygame.font.Font(self.font, self.font_size)
         text = font.render(self.text, True, (0, 0, 0))
-        s.blit(text, [self.size[0]//2, self.size[1]//2])
+        s.blit(text, [(self.size[0]-len(self.text)*5)//2, self.size[1]//2])
         mouse_pos = pygame.mouse.get_pos()
         r = None
         if self.get_rect().collidepoint(mouse_pos):
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-                r = self.function(*args, **kwargs)
                 self.clicked = True
-        if pygame.mouse.get_pressed()[0] == 0: self.clicked = False
-        screen.blit(s)
+            if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
+                self.clicked = False
+                r = self.function(*args, **kwargs)
+        if pygame.mouse.get_pressed()[0] == 0:
+            self.clicked = False
+        if self.clicked:
+            s = pygame.transform.scale_by(s, 0.9)
+        screen.blit(s, self.pos)
         return r
 
     def get_rect(self):

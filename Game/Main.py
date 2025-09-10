@@ -50,11 +50,12 @@ clicked_button = False
 color_bg_sys = COLORS(fps)
 
 
-b = Button(text="Keep Cards", font_size=10)
+b = Button(text="Keep Cards", font_size=10, size=[100, 90], pos=[current_w-110, current_h-100])
 
 def save_later_wrapper():
     for card in in_hand.deck:
         if card.selected:
+            card.selected = False
             save_deck.append(card)
     return True
 
@@ -100,6 +101,12 @@ while running:
 
     # Draw cards up to 5
     if is_bogey_turn:
+        if len(in_hand) == 0:
+            is_bogey_turn = False
+            clicked_button = False
+            in_hand.add_cards(save_deck.copy())
+            save_deck.clear()
+            draw_cards = True
         ...
     elif draw_cards:
         for _ in range(5 - len(in_hand)):

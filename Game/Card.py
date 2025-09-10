@@ -7,6 +7,7 @@ class Card:
 
     WIDTH = 200
     HEIGHT = 280
+    SELECTED_SCALE_UP = 1.1
 
     def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos=None, speed=5):
         assert 0 <= suit <= 3
@@ -106,7 +107,11 @@ class Card:
                 self.clicked = False
 
         pos = self.get_pos()
-        screen.blit(self.surface, pos)
+        s = self.surface
+        if self.selected:
+            s = pygame.transform.scale_by(s, Card.SELECTED_SCALE_UP)
+            pos = [pos[0] - Card.SELECTED_SCALE_UP, pos[1] - Card.SELECTED_SCALE_UP]
+        screen.blit(s, pos)
         self.priority = 0
 
 
