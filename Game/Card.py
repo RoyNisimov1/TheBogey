@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 from Game.GLOBAL import GLOBAL
@@ -7,7 +9,8 @@ class Card:
 
     WIDTH = 200
     HEIGHT = 280
-    SELECTED_SCALE_UP = 2.5/3.5 * 1.5
+    SELECTED_SCALE_UP = 1.1
+    BASE_SCALE = 0.5
     SPEED = 5
     SCALE_UP_SPEED = 5
 
@@ -47,9 +50,6 @@ class Card:
     def set_active(self, v: bool):
         self.active = v
 
-    def draw(self, screen: pygame.Surface, pos: list[int] = None):
-        if pos is None: pos = [self.x, self.y]
-        screen.blit(self.surface, pos)
 
     def set_pos(self, pos: list[int], priority: int = 0):
         if priority < self.priority: return
@@ -60,7 +60,7 @@ class Card:
 
     def on_mouse_hover(self):
         if not GLOBAL().get_is_active():
-            self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]-30], self.speed*self.delta_time), 4)
+            self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]-30], self.speed*self.delta_time), 3)
         return
 
     def on_mouse_click(self):
@@ -91,11 +91,12 @@ class Card:
         mouse_pos = pygame.mouse.get_pos()
         mouse_buttons = pygame.mouse.get_pressed()
         mouse_buttons_release = pygame.mouse.get_just_released()
+        if mouse_buttons_release[0] == 1:
+            self.on_mouse_release()
+            self.clicked = False
         if self.get_rect().collidepoint(mouse_pos):
             self.on_mouse_hover()
-            if mouse_buttons_release[0] == 1:
-                self.on_mouse_release()
-                self.clicked = False
+
             if mouse_buttons[0] == 1:
                 move = False
                 if GLOBAL().is_mouse_moving:
@@ -109,23 +110,37 @@ class Card:
 
 
 
-        s = self.surface
+        s = self.get_surface_og()
         center_s = self.get_center()
         t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
         if self.selected:
             t = LerpFuncs.LERP(self.current_scale, Card.SELECTED_SCALE_UP, self.scale_up_speed*GLOBAL().get_dt())
-        s = pygame.transform.smoothscale_by(s, t)
+        s = pygame.transform.smoothscale(s, (math.floor(Card.WIDTH * t), math.floor(Card.HEIGHT * t)))
         rect = s.get_rect(center=center_s)
         screen.blit(s, rect)
         self.current_scale = t
         self.priority = 0
 
 
+
+
+    def get_surface_og(self):
+        if self.suit != 0:
+            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+            s.fill((255, 255, 255))
+            font = pygame.font.Font('freesansbold.ttf', 32)
+            text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
+            s.blit(text, [100, 140])
+            return s
+        s = GLOBAL().CLUBS_MANAGER.get(self.value, 1)
+
+        return s
+
     def get_pos(self):
-        return [self.x, self.y]
+        return (self.x, self.y)
 
     def get_rect(self):
-        return self.surface.get_rect(topleft=(self.x, self.y))
+        return self.surface.get_rect(topleft=self.get_pos())
 
     def get_center(self):
         return self.x+Card.WIDTH/2, self.y+Card.HEIGHT/2

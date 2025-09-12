@@ -7,10 +7,12 @@ class LerpFuncs():
     @staticmethod
     def LERPPos(start_pos: list[int], end_pos: list[int], speed: float = 0.1) -> list[float]:
         if speed > 1: speed = 1
+        if speed < 0: speed = 0
+
         x = start_pos[0] + (end_pos[0] - start_pos[0]) * speed
         y = start_pos[1] + (end_pos[1] - start_pos[1]) * speed
         if math.ceil(x) == end_pos[0] and math.ceil(y) == end_pos[1]:
-            return end_pos
+            return end_pos.copy()
         return [x, y].copy()
 
     @staticmethod

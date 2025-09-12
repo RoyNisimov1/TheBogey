@@ -123,11 +123,13 @@ while running:
     poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space)
     for i in range(len(in_hand)):
         card = in_hand.deck[i]
-        card.rest_pos = poses[i]
-        l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
-        card.set_pos(l, 1)
-        if card.active:
-            card.set_pos([mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], 3)
+        if not card.active:
+            card.rest_pos = poses[i].copy()
+            l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
+            card.set_pos(l, 1)
+        else:
+            p = LerpFuncs.LERPPos(start_pos=card.get_pos(), end_pos=[mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], speed=card_speed)
+            card.set_pos(p, 4)
 
     for i, deck in enumerate(decks):
         succeeded = deck.check_mouse_events()
@@ -155,7 +157,7 @@ while running:
     delta_time = clock.tick(fps) / 1000
     delta_time = max(0.001, min(0.1, delta_time))
     GLOBAL().set_dt(delta_time)
-    GLOBAL().update_mouse(delta_time)
+    GLOBAL().update_mouse()
 
 pygame.quit()
 

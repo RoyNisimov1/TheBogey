@@ -37,7 +37,8 @@ class GLOBAL:
     def get_current(self):
         return self.current
 
-    def update_mouse(self, delta_time: float):
+    def update_mouse(self):
+        delta_time = self.delta_time
         mouse_buttons = pygame.mouse.get_pressed()
         if mouse_buttons[0]: self.time_held += delta_time
         else:
