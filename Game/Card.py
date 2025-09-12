@@ -98,12 +98,9 @@ class Card:
                 self.clicked = False
             if mouse_buttons[0] == 1:
                 move = False
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEMOTION:
-                        self.on_mouse_hold()
-                        move = True
-
-                        break
+                if GLOBAL().is_mouse_moving:
+                    self.on_mouse_hold()
+                    move = True
                 if GLOBAL().time_held < GLOBAL().CLICK_TIME and not move:
                     self.on_mouse_click()
                     if not self.clicked:
@@ -117,7 +114,7 @@ class Card:
         t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
         if self.selected:
             t = LerpFuncs.LERP(self.current_scale, Card.SELECTED_SCALE_UP, self.scale_up_speed*GLOBAL().get_dt())
-        s = pygame.transform.scale_by(s, t)
+        s = pygame.transform.smoothscale_by(s, t)
         rect = s.get_rect(center=center_s)
         screen.blit(s, rect)
         self.current_scale = t
@@ -128,7 +125,7 @@ class Card:
         return [self.x, self.y]
 
     def get_rect(self):
-        return self.surface.get_rect(center=(self.x+Card.WIDTH/2, self.y+Card.HEIGHT/2))
+        return self.surface.get_rect(topleft=(self.x, self.y))
 
     def get_center(self):
         return self.x+Card.WIDTH/2, self.y+Card.HEIGHT/2

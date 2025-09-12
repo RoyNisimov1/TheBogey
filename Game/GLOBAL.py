@@ -17,6 +17,7 @@ class GLOBAL:
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
             cls._instance.delta_time = 0.1
             cls._instance.CLICK_TIME = 0.09
+            cls._instance.is_mouse_moving = False
         return cls._instance
 
     def set_dt(self, dt: float):

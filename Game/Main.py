@@ -70,9 +70,12 @@ while running:
     screen.fill(c)
 
     mouse_pos = pygame.mouse.get_pos()
+    GLOBAL().is_mouse_moving = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEMOTION:
+            GLOBAL().is_mouse_moving = True
 
 
     keys = pygame.key.get_pressed()
