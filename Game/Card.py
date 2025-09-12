@@ -46,6 +46,14 @@ class Card:
         self.clicked = False
         self.current_scale = 1
         self.scale_up_speed = scale_up_speed
+        self.rotation = 0 # in degs
+
+
+
+
+    def collides_with_mouse(self):
+        mouse_pos = pygame.mouse.get_pos()
+        return self.get_rect().collidepoint(mouse_pos)
 
     def set_active(self, v: bool):
         self.active = v
@@ -88,15 +96,15 @@ class Card:
 
     def update(self, screen):
         self.delta_time = GLOBAL().get_dt()
-        mouse_pos = pygame.mouse.get_pos()
+
         mouse_buttons = pygame.mouse.get_pressed()
         mouse_buttons_release = pygame.mouse.get_just_released()
         if mouse_buttons_release[0] == 1:
             self.on_mouse_release()
             self.clicked = False
-        if self.get_rect().collidepoint(mouse_pos):
-            self.on_mouse_hover()
 
+        if self.collides_with_mouse():
+            self.on_mouse_hover()
             if mouse_buttons[0] == 1:
                 move = False
                 if GLOBAL().is_mouse_moving:
@@ -108,14 +116,13 @@ class Card:
                         self.selected = not self.selected
                         self.clicked = True
 
-
-
         s = self.get_surface_og()
         center_s = self.get_center()
         t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
         if self.selected:
             t = LerpFuncs.LERP(self.current_scale, Card.SELECTED_SCALE_UP, self.scale_up_speed*GLOBAL().get_dt())
         s = pygame.transform.smoothscale(s, (math.floor(Card.WIDTH * t), math.floor(Card.HEIGHT * t)))
+        s = pygame.transform.rotate(s, self.rotation)
         rect = s.get_rect(center=center_s)
         screen.blit(s, rect)
         self.current_scale = t

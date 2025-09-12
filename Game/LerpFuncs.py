@@ -11,9 +11,14 @@ class LerpFuncs():
 
         x = start_pos[0] + (end_pos[0] - start_pos[0]) * speed
         y = start_pos[1] + (end_pos[1] - start_pos[1]) * speed
-        if math.ceil(x) == end_pos[0] and math.ceil(y) == end_pos[1]:
+        if LerpFuncs.rough_eq(start_pos, end_pos):
             return end_pos.copy()
         return [x, y].copy()
+
+    @staticmethod
+    def rough_eq(a, b):
+        return a[0] // 1 == b[0] // 1 and a[1] // 1 == b[1] // 1
+
 
     @staticmethod
     def ease_in_sine(t):

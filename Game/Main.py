@@ -1,6 +1,6 @@
 
 import pygame
-
+import math
 from Game.GLOBAL import GLOBAL
 from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
@@ -18,7 +18,7 @@ pygame.display.set_caption("The Bogey")
 
 running: bool = True
 clock = pygame.time.Clock()
-fps: int = 240
+fps: int = 1000
 delta_time: float = 0.1
 
 
@@ -40,6 +40,8 @@ in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 save_deck = []
 base_speed = 10
+card_rotation_speed = 10
+torque = 10
 space = 20
 draw_cards = True
 cards_in_place = 0
@@ -63,7 +65,7 @@ b.set_f(save_later_wrapper)
 while running:
 
     card_speed = base_speed*delta_time
-
+    card_rot_speed = card_rotation_speed * delta_time
     # SCREEN COLOR LERP
 
     c = color_bg_sys.update(delta_time)
@@ -127,9 +129,21 @@ while running:
             card.rest_pos = poses[i].copy()
             l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
             card.set_pos(l, 1)
+            card.rotation = LerpFuncs.LERP(card.rotation, 0, card_rot_speed)
         else:
-            p = LerpFuncs.LERPPos(start_pos=card.get_pos(), end_pos=[mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], speed=card_speed)
-            card.set_pos(p, 4)
+            new_pos = LerpFuncs.LERPPos(start_pos=card.get_pos(), end_pos=[mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], speed=card_speed)
+            is_rough_eq = card.collides_with_mouse()
+            card.set_pos(new_pos, 4)
+            if not is_rough_eq:
+                diff = [mouse_pos[0] - card.get_center()[0], (mouse_pos[1] - card.get_center()[1])//1]
+                # Normalising the vector
+                len_v = math.sqrt(pow(diff[0], 2) + pow(diff[1], 2))
+                if len_v == 0: len_v = 1
+                diff = diff[1] // len_v, diff[0] // len_v
+                r = math.atan2(diff[1], diff[0]) * -torque
+                card.rotation = LerpFuncs.LERP(card.rotation, math.floor(r), card_rot_speed)
+            else:
+                card.rotation = LerpFuncs.LERP(card.rotation, 0, card_rot_speed)
 
     for i, deck in enumerate(decks):
         succeeded = deck.check_mouse_events()
