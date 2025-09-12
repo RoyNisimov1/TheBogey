@@ -1,4 +1,3 @@
-import math
 
 import pygame
 
@@ -19,7 +18,7 @@ pygame.display.set_caption("The Bogey")
 
 running: bool = True
 clock = pygame.time.Clock()
-fps: int = 60
+fps: int = 240
 delta_time: float = 0.1
 
 
@@ -41,7 +40,7 @@ in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 save_deck = []
 base_speed = 10
-space = 10
+space = 20
 draw_cards = True
 cards_in_place = 0
 clicked_button = False
@@ -144,7 +143,7 @@ while running:
 
     for card in in_hand.deck:
         if card is not None:
-            card.update(screen, delta_time)
+            card.update(screen)
 
 
 
@@ -152,7 +151,9 @@ while running:
 
     delta_time = clock.tick(fps) / 1000
     delta_time = max(0.001, min(0.1, delta_time))
+    GLOBAL().set_dt(delta_time)
     GLOBAL().update_mouse(delta_time)
+
 pygame.quit()
 
 

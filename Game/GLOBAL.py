@@ -15,7 +15,14 @@ class GLOBAL:
             cls._instance.time_held = 0.0
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
+            cls._instance.delta_time = 0.1
+            cls._instance.CLICK_TIME = 0.09
         return cls._instance
+
+    def set_dt(self, dt: float):
+        self.delta_time = dt
+
+    def get_dt(self): return self.delta_time
 
     def set_is_active(self, v: bool):
         self.is_card_active: bool = v

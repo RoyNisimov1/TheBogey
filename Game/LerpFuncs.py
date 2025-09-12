@@ -22,6 +22,12 @@ class LerpFuncs():
        t = LerpFuncs.ease_in_sine(speed)
        return LerpFuncs.LERPPos(start_pos, end_pos, t)
 
+    @staticmethod
+    def LERP(a, b, t):
+        if t > 1: t = 1
+        if t < 0: t = 0
+        return a + (b - a)*t
+
 
 
 
