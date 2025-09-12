@@ -9,6 +9,8 @@ class Card:
     HEIGHT = 280
     SELECTED_SCALE_UP = 1.1
 
+
+
     def __init__(self, value: int, suit: int, pos: list[int] = None, rest_pos=None, speed=5):
         assert 0 <= suit <= 3
         # Suit will be CHaSeD order:
@@ -110,7 +112,7 @@ class Card:
         s = self.surface
         if self.selected:
             s = pygame.transform.scale_by(s, Card.SELECTED_SCALE_UP)
-            pos = [pos[0] - Card.SELECTED_SCALE_UP, pos[1] - Card.SELECTED_SCALE_UP]
+
         screen.blit(s, pos)
         self.priority = 0
 
@@ -123,11 +125,15 @@ class Card:
 
     def load_surface(self) -> pygame.Surface:
         # Card aspect ratio is 2.5/3.5
-        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
-        s.fill((255, 255, 255))
-        font = pygame.font.Font('freesansbold.ttf', 32)
-        text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
-        s.blit(text, [100, 140])
+        if self.suit != 0:
+            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+            s.fill((255, 255, 255))
+            font = pygame.font.Font('freesansbold.ttf', 32)
+            text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
+            s.blit(text, [100, 140])
+            return s
+        s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
+
         return s
 
     def __repr__(self):

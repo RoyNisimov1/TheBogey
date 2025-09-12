@@ -1,4 +1,5 @@
 import pygame
+from Game.CardsAssetManager import CardsAssetManager
 
 
 class GLOBAL:
@@ -12,6 +13,8 @@ class GLOBAL:
             cls._instance.is_card_active = False
             cls._instance.current = None
             cls._instance.time_held = 0.0
+            cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
+            cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
         return cls._instance
 
     def set_is_active(self, v: bool):
