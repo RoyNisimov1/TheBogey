@@ -41,8 +41,10 @@ discard_deck = Deck([])
 save_deck = []
 base_speed = 10
 card_rotation_speed = 10
-torque = 10
+torque = 30
 space = 20
+vicinity_rect = pygame.rect.Rect([0, current_h - 500, current_w, current_h])
+is_card_in_vicinity = False
 draw_cards = True
 cards_in_place = 0
 clicked_button = False
@@ -119,10 +121,10 @@ while running:
             in_hand.add_card(c)
         draw_cards = False
 
+    if GLOBAL().is_card_active:
+        is_card_in_vicinity = vicinity_rect.collidepoint(mouse_pos)
 
-
-
-    poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space)
+    poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space, skip=not is_card_in_vicinity)
     for i in range(len(in_hand)):
         card = in_hand.deck[i]
         if not card.active:
@@ -135,12 +137,10 @@ while running:
             is_rough_eq = card.collides_with_mouse()
             card.set_pos(new_pos, 4)
             if not is_rough_eq:
-                diff = [mouse_pos[0] - card.get_center()[0], (mouse_pos[1] - card.get_center()[1])//1]
-                # Normalising the vector
-                len_v = math.sqrt(pow(diff[0], 2) + pow(diff[1], 2))
-                if len_v == 0: len_v = 1
-                diff = diff[1] // len_v, diff[0] // len_v
-                r = math.atan2(diff[1], diff[0]) * -torque
+                diff = mouse_pos[0] - card.get_center()[0]
+                r = 0
+                if diff > 0: r = -torque
+                elif diff < 0: r = torque
                 card.rotation = LerpFuncs.LERP(card.rotation, math.floor(r), card_rot_speed)
             else:
                 card.rotation = LerpFuncs.LERP(card.rotation, 0, card_rot_speed)
@@ -172,7 +172,7 @@ while running:
     delta_time = max(0.001, min(0.1, delta_time))
     GLOBAL().set_dt(delta_time)
     GLOBAL().update_mouse()
-
+    is_card_in_vicinity = False
 pygame.quit()
 
 

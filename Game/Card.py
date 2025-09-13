@@ -31,7 +31,7 @@ class Card:
         #   13: King
         self.suit = suit
         self.value = value
-        self.surface = self.load_surface()
+        self.surface = self.get_surface_og()
         if pos is None: pos = [0, 0]
         self.active = False
         self.x = pos[0]
@@ -116,7 +116,7 @@ class Card:
                         self.selected = not self.selected
                         self.clicked = True
 
-        s = self.get_surface_og()
+        s = self.surface
         center_s = self.get_center()
         t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
         if self.selected:
@@ -144,10 +144,10 @@ class Card:
         return s
 
     def get_pos(self):
-        return (self.x, self.y)
+        return self.x, self.y
 
     def get_rect(self):
-        return self.surface.get_rect(topleft=self.get_pos())
+        return pygame.Rect([self.get_pos()[0], self.get_pos()[1], Card.WIDTH, Card.HEIGHT])
 
     def get_center(self):
         return self.x+Card.WIDTH/2, self.y+Card.HEIGHT/2

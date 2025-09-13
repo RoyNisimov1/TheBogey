@@ -40,15 +40,18 @@ class Deck:
         screen.blit(s, pos)
 
 
-    def draw_deck(self, start_pos, space, card_size=Card.WIDTH):
+    def draw_deck(self, start_pos, space, card_size=Card.WIDTH, skip=False):
         poses = []
-        j = 0
-        for i in range(len(self.deck)):
-            if self.deck[i].active:
-                poses.append([0,0])
-                continue
-            poses.append([start_pos[0] + j * (card_size + space), start_pos[1]])
-            j += 1
+        if skip:
+            j = 0
+            for i in range(len(self.deck)):
+                if self.deck[i].active:
+                    poses.append([0, 0])
+                    continue
+                poses.append([start_pos[0] + j * (card_size + space), start_pos[1]])
+                j += 1
+        else:
+            poses = [[start_pos[0] + i * (card_size + space), start_pos[1]] for i in range(len(self))]
         return poses
 
     def get_rect(self):
@@ -107,7 +110,11 @@ class Deck:
             s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
             s.fill((0, 0, 0))
             return s
-        s = self.deck[len(self.deck)-1].surface
+        s = self.deck[len(self.deck)-1]
+        if s.suit == 0:
+            s = pygame.transform.scale_by(s.surface, 0.5)
+        else:
+            s = s.surface
         return s
 
 
