@@ -18,6 +18,8 @@ class GLOBAL:
             cls._instance.delta_time = 0.1
             cls._instance.CLICK_TIME = 0.09
             cls._instance.is_mouse_moving = False
+            cls._instance.current_screen = 0
+            cls._instance.running = True
         return cls._instance
 
     def set_dt(self, dt: float):

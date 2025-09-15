@@ -16,7 +16,7 @@ current_w, current_h = infoObject.current_w, infoObject.current_h
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("The Bogey")
 
-running: bool = True
+
 clock = pygame.time.Clock()
 fps: int = 1000
 delta_time: float = 0.1
@@ -52,8 +52,22 @@ clicked_button = False
 
 color_bg_sys = COLORS(fps)
 
+button_size_normal = [250, 90]
 
-b = Button(text="Keep Cards", font_size=10, size=[100, 90], pos=[current_w-110, current_h-100])
+keep_cards = Button(text="Keep Cards", font_size=10, size=button_size_normal, pos=[current_w-300, current_h-100])
+
+
+main_screen_bg_color = (97, 81, 79)
+main_menu_quit = Button(text="Quit", font_size=10, size=button_size_normal)
+def quite():
+    GLOBAL().running = False
+main_menu_quit.set_f(quite)
+main_menu_resume = Button(text="Resume", font_size=10, size=button_size_normal)
+def resume():
+    GLOBAL().current_screen = 0
+main_menu_resume.set_f(resume)
+
+main_menu_holder = [main_menu_resume, main_menu_quit]
 
 def save_later_wrapper():
     for card in in_hand.deck:
@@ -63,8 +77,8 @@ def save_later_wrapper():
     return True
 
 
-b.set_f(save_later_wrapper)
-while running:
+keep_cards.set_f(save_later_wrapper)
+while GLOBAL().running:
 
     card_speed = base_speed*delta_time
     card_rot_speed = card_rotation_speed * delta_time
@@ -77,13 +91,34 @@ while running:
     GLOBAL().is_mouse_moving = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            GLOBAL().running = False
         if event.type == pygame.MOUSEMOTION:
             GLOBAL().is_mouse_moving = True
+        if event.type == pygame.KEYDOWN:
+            # key handling
+            if event.key == pygame.K_ESCAPE:
+                if GLOBAL().current_screen == 1:
+                    GLOBAL().current_screen = 0
+                else: GLOBAL().current_screen = 1
 
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_ESCAPE]: running = False
+
+    if GLOBAL().current_screen == 1:
+        screen.fill(main_screen_bg_color)
+        # draw buttons
+        for i, button in enumerate(main_menu_holder):
+            button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) *(space + button.size[1]))/ 2 + i * (space + button.size[1]))])
+            button.update(screen)
+
+
+        pygame.display.flip()
+
+        delta_time = clock.tick(fps) / 1000
+        delta_time = max(0.001, min(0.1, delta_time))
+        GLOBAL().set_dt(delta_time)
+        GLOBAL().update_mouse()
+        is_card_in_vicinity = False
+        continue
 
     # GAME
 
@@ -154,7 +189,7 @@ while running:
             GLOBAL().set_is_active(False)
 
     if not is_bogey_turn:
-        clicked_button = b.update(screen)
+        clicked_button = keep_cards.update(screen)
 
 
     for deck in decks:

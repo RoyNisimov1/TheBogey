@@ -40,13 +40,18 @@ class Button:
                 self.clicked = True
             if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
                 self.clicked = False
-                r = self.function(*args, **kwargs)
+                if self.function is not None:
+                    r = self.function(*args, **kwargs)
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
         if self.clicked:
             s = pygame.transform.scale_by(s, 0.9)
-        screen.blit(s, self.pos)
+        screen.blit(s, self.get_rect())
         return r
+
+    def set_pos(self, pos: list[int]):
+        self.pos = pos
+
 
     def get_rect(self):
         if self.bg_sprite is not None:
