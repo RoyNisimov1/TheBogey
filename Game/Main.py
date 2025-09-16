@@ -155,6 +155,7 @@ while GLOBAL().running:
             c.set_pos(in_hand.start_pos)
             in_hand.add_card(c)
         draw_cards = False
+        in_hand.order_deck()
 
     if GLOBAL().is_card_active:
         is_card_in_vicinity = vicinity_rect.collidepoint(mouse_pos)

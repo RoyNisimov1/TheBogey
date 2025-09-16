@@ -38,7 +38,9 @@ class Deck:
         s = self.get_top_card_surface()
         pos = self.start_pos
         screen.blit(s, pos)
-
+    
+    def order_deck(self):
+        self.deck.sort()
 
     def draw_deck(self, start_pos, space, card_size=Card.WIDTH, skip=False):
         poses = []

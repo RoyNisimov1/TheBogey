@@ -1,4 +1,6 @@
+from __future__ import annotations
 import math
+from typing import Any
 
 import pygame
 
@@ -128,6 +130,13 @@ class Card:
         self.current_scale = t
         self.priority = 0
 
+
+    def __lt__(self, other: Card) -> bool:
+        if type(other) != type(self):
+            return False
+        if self.suit > other.suit: return False
+        if self.suit < other.suit: return True
+        return self.value < other.value
 
 
 
