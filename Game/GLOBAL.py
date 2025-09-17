@@ -13,16 +13,26 @@ class GLOBAL:
             cls._instance.is_card_active = False
             cls._instance.current = None
             cls._instance.time_held = 0.0
+            cls._instance.high_to_low = True
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
             cls._instance.HEARTS_ASSET_LOC = "Game/Assets/Hearts"
             cls._instance.HEARTS_MANAGER = CardsAssetManager(cls._instance.HEARTS_ASSET_LOC)
+            cls._instance.BASE_SPEED = 10
+            cls._instance.ROTATION_SPEED = 20
+            cls._instance.TORQUE = 30
             cls._instance.delta_time = 0.1
             cls._instance.CLICK_TIME = 0.09
             cls._instance.is_mouse_moving = False
             cls._instance.current_screen = 0
             cls._instance.running = True
         return cls._instance
+
+    def get_dt_base(self):
+        return self.BASE_SPEED * self.get_dt()
+
+    def get_dt_rot_speed(self):
+        return self.ROTATION_SPEED * self.get_dt()
 
     def set_dt(self, dt: float):
         self.delta_time = dt

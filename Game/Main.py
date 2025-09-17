@@ -39,8 +39,7 @@ firstCard = draw_deck.draw_card()
 in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 save_deck = []
-base_speed = 10
-card_rotation_speed = 10
+
 torque = 30
 space = 20
 vicinity_rect = pygame.rect.Rect([0, current_h - 500, current_w, current_h])
@@ -80,8 +79,8 @@ def save_later_wrapper():
 keep_cards.set_f(save_later_wrapper)
 while GLOBAL().running:
 
-    card_speed = base_speed*delta_time
-    card_rot_speed = card_rotation_speed * delta_time
+    card_speed = GLOBAL().get_dt_base()
+    card_rot_speed = GLOBAL().get_dt_rot_speed()
     # SCREEN COLOR LERP
 
     c = color_bg_sys.update(delta_time)
@@ -152,7 +151,7 @@ while GLOBAL().running:
     elif draw_cards:
         for _ in range(5 - len(in_hand)):
             c = draw_deck.draw_card()
-            c.set_pos(in_hand.start_pos)
+            c.lerp_pos(in_hand.start_pos,0, rot_speed=0)
             in_hand.add_card(c)
         draw_cards = False
         in_hand.order_deck()
@@ -165,21 +164,11 @@ while GLOBAL().running:
         card = in_hand.deck[i]
         if not card.active:
             card.rest_pos = poses[i].copy()
-            l = LerpFuncs.LERPPos(card.get_pos(), poses[i], card_speed)
-            card.set_pos(l, 1)
-            card.rotation = LerpFuncs.LERP(card.rotation, 0, card_rot_speed)
+            card.lerp_pos(poses[i], 1, rot_speed=0)
         else:
-            new_pos = LerpFuncs.LERPPos(start_pos=card.get_pos(), end_pos=[mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2], speed=card_speed)
+            new_pos = [mouse_pos[0] - Card.WIDTH / 2, mouse_pos[1] - Card.HEIGHT / 2]
             is_rough_eq = card.collides_with_mouse()
-            card.set_pos(new_pos, 4)
-            if not is_rough_eq:
-                diff = mouse_pos[0] - card.get_center()[0]
-                r = 0
-                if diff > 0: r = -torque
-                elif diff < 0: r = torque
-                card.rotation = LerpFuncs.LERP(card.rotation, math.floor(r), card_rot_speed)
-            else:
-                card.rotation = LerpFuncs.LERP(card.rotation, 0, card_rot_speed)
+            card.lerp_pos(new_pos, 4, rot_speed=int(not is_rough_eq) * card_rot_speed)
 
     for i, deck in enumerate(decks):
         succeeded = deck.check_mouse_events()

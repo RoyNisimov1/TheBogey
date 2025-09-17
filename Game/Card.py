@@ -1,4 +1,4 @@
-from __future__ import annotations
+
 import math
 from typing import Any
 
@@ -68,10 +68,7 @@ class Card:
         self.priority = priority
 
 
-    def on_mouse_hover(self):
-        if not GLOBAL().get_is_active():
-            self.set_pos(LerpFuncs.LERPPos(self.get_pos(), [self.rest_pos[0], self.rest_pos[1]-30], self.speed*self.delta_time), 3)
-        return
+
 
     def on_mouse_click(self):
         ...
@@ -117,7 +114,6 @@ class Card:
                     if not self.clicked:
                         self.selected = not self.selected
                         self.clicked = True
-
         s = self.surface
         center_s = self.get_center()
         t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
@@ -130,12 +126,34 @@ class Card:
         self.current_scale = t
         self.priority = 0
 
+    def lerp_pos(self, pos, priority, speed=0.1, rot_speed=GLOBAL().get_dt_rot_speed()):
+        if priority < self.priority:
+            return
+        p = LerpFuncs.LERPPos(self.get_pos(), pos, speed)
+        r = 0
+        if rot_speed != 0:
+            diff = pos[0] - self.get_center()[0]
+            if diff > 0:
+                r = -GLOBAL().TORQUE
+            elif diff < 0:
+                r = GLOBAL().TORQUE
+        if rot_speed == 0:
+            rot_speed = GLOBAL().get_dt_rot_speed()
+        self.rotation = LerpFuncs.LERP(self.rotation, r, rot_speed)
+        self.set_pos(p, priority)
 
-    def __lt__(self, other: Card) -> bool:
+    def on_mouse_hover(self):
+        if not GLOBAL().get_is_active():
+            self.lerp_pos([self.rest_pos[0], self.rest_pos[1]-30], priority=3, rot_speed=0)
+        return
+
+    def __lt__(self, other) -> bool:
         if type(other) != type(self):
             return False
         if self.suit > other.suit: return False
         if self.suit < other.suit: return True
+        if GLOBAL().high_to_low:
+            return self.value > other.value
         return self.value < other.value
 
 
@@ -153,7 +171,6 @@ class Card:
             s = GLOBAL().HEARTS_MANAGER.get(self.value, 0.5)
         return s
 
-        return s
 
     def get_pos(self):
         return self.x, self.y

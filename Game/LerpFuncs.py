@@ -12,7 +12,7 @@ class LerpFuncs():
         x = start_pos[0] + (end_pos[0] - start_pos[0]) * speed
         y = start_pos[1] + (end_pos[1] - start_pos[1]) * speed
         if LerpFuncs.rough_eq(start_pos, end_pos):
-            return end_pos.copy()
+            return end_pos
         return [x, y].copy()
 
     @staticmethod
@@ -33,7 +33,7 @@ class LerpFuncs():
     def LERP(a, b, t):
         if t > 1: t = 1
         if t < 0: t = 0
-        return a + (b - a)*t
+        return a + (b - a) * t
 
 
 

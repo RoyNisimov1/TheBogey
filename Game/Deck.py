@@ -113,10 +113,7 @@ class Deck:
             s.fill((0, 0, 0))
             return s
         s = self.deck[len(self.deck)-1]
-        if s.suit == 0:
-            s = pygame.transform.scale_by(s.surface, 0.5)
-        else:
-            s = s.surface
+        s = s.surface
         return s
 
 
