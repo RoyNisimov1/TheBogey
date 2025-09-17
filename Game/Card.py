@@ -46,7 +46,6 @@ class Card:
         self.priority = 0
         self.selected = False
         self.clicked = False
-        self.current_scale = 1
         self.scale_up_speed = scale_up_speed
         self.rotation = 0 # in degs
 
@@ -116,14 +115,13 @@ class Card:
                         self.clicked = True
         s = self.surface
         center_s = self.get_center()
-        t = LerpFuncs.LERP(self.current_scale, 1, self.scale_up_speed*GLOBAL().get_dt())
+
         if self.selected:
-            t = LerpFuncs.LERP(self.current_scale, Card.SELECTED_SCALE_UP, self.scale_up_speed*GLOBAL().get_dt())
-        s = pygame.transform.smoothscale(s, (math.floor(Card.WIDTH * t), math.floor(Card.HEIGHT * t)))
+            self.lerp_pos((self.rest_pos[0], self.rest_pos[1] - 40), 3, rot_speed=0)
+
         s = pygame.transform.rotate(s, self.rotation)
         rect = s.get_rect(center=center_s)
         screen.blit(s, rect)
-        self.current_scale = t
         self.priority = 0
 
     def lerp_pos(self, pos, priority, speed=0.1, rot_speed=GLOBAL().get_dt_rot_speed()):
@@ -157,6 +155,18 @@ class Card:
         return self.value < other.value
 
 
+    def get_surface_size(self, size):
+        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+        s.fill((255, 255, 255))
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
+        s.blit(text, [100, 140])
+
+        if self.suit == 0:
+            s = GLOBAL().CLUBS_MANAGER.get(self.value, size)
+        elif self.suit == 1:
+            s = GLOBAL().HEARTS_MANAGER.get(self.value, size)
+        return s
 
     def get_surface_og(self):
         s = pygame.Surface([Card.WIDTH, Card.HEIGHT])

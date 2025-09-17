@@ -31,7 +31,7 @@ class Button:
         else:
             s = self.bg_sprite
         font = pygame.font.Font(self.font, self.font_size)
-        text = font.render(self.text, True, (0, 0, 0))
+        text = font.render(self.text, True, (0, 0, 0), wraplength=400)
         s.blit(text, [(self.size[0]-len(self.text)*5)//2, self.size[1]//2])
         mouse_pos = pygame.mouse.get_pos()
         r = None
