@@ -15,6 +15,8 @@ class GLOBAL:
             cls._instance.time_held = 0.0
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
+            cls._instance.HEARTS_ASSET_LOC = "Game/Assets/Hearts"
+            cls._instance.HEARTS_MANAGER = CardsAssetManager(cls._instance.HEARTS_ASSET_LOC)
             cls._instance.delta_time = 0.1
             cls._instance.CLICK_TIME = 0.09
             cls._instance.is_mouse_moving = False

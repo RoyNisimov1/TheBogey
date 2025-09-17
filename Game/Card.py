@@ -141,14 +141,17 @@ class Card:
 
 
     def get_surface_og(self):
-        if self.suit != 0:
-            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
-            s.fill((255, 255, 255))
-            font = pygame.font.Font('freesansbold.ttf', 32)
-            text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
-            s.blit(text, [100, 140])
-            return s
-        s = GLOBAL().CLUBS_MANAGER.get(self.value, 1)
+        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+        s.fill((255, 255, 255))
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
+        s.blit(text, [100, 140])
+
+        if self.suit == 0:
+            s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
+        elif self.suit == 1:
+            s = GLOBAL().HEARTS_MANAGER.get(self.value, 0.5)
+        return s
 
         return s
 
@@ -163,15 +166,16 @@ class Card:
 
     def load_surface(self) -> pygame.Surface:
         # Card aspect ratio is 2.5/3.5
-        if self.suit != 0:
-            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
-            s.fill((255, 255, 255))
-            font = pygame.font.Font('freesansbold.ttf', 32)
-            text = font.render(f"{self.value}, {self.suit}", True, (0,0,0))
-            s.blit(text, [100, 140])
-            return s
-        s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
+        s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
+        s.fill((255, 255, 255))
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(f"{self.value}, {self.suit}", True, (0, 0, 0))
+        s.blit(text, [100, 140])
 
+        if self.suit == 0:
+            s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
+        elif self.suit == 1:
+            s = GLOBAL().HEARTS_MANAGER.get(self.value, 0.5)
         return s
 
     def __repr__(self):
