@@ -1,8 +1,6 @@
 
 import pygame
-import math
 from Game.GLOBAL import GLOBAL
-from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
 from Game.Deck import Deck
 from Game.Color import COLORS
@@ -42,7 +40,12 @@ save_deck = []
 
 torque = 30
 space = 20
-vicinity_rect = pygame.rect.Rect([0, current_h - 500, current_w, current_h])
+t_width = ((Card.WIDTH + space) * 5 - space) + 60
+vicinity_rect = pygame.rect.Rect([current_w / 2 - (t_width+ space)/2, current_h - (Card.HEIGHT + 50), t_width, Card.HEIGHT + 100])
+vicinity_surface = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
+vicinity_surface = pygame.transform.smoothscale(vicinity_surface, (vicinity_rect.width, vicinity_rect.height))
+vicinity_surface.set_alpha(256)
+
 is_card_in_vicinity = False
 draw_cards = True
 cards_in_place = 0
@@ -52,16 +55,16 @@ clicked_button = False
 color_bg_sys = COLORS(fps)
 
 button_size_normal = [250, 90]
-
-keep_cards = Button(text="Keep Cards", font_size=10, size=button_size_normal, pos=[current_w-300, current_h-100])
+BUTTON_SPRITE = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
+keep_cards = Button(text="Keep Cards", font_size=10, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE)
 
 
 main_screen_bg_color = (97, 81, 79)
-main_menu_quit = Button(text="Quit", font_size=10, size=button_size_normal)
+main_menu_quit = Button(text="Quit", font_size=10, size=button_size_normal, bg_sprite=BUTTON_SPRITE)
 def quite():
     GLOBAL().running = False
 main_menu_quit.set_f(quite)
-main_menu_resume = Button(text="Resume", font_size=10, size=button_size_normal)
+main_menu_resume = Button(text="Resume", font_size=10, size=button_size_normal, bg_sprite=BUTTON_SPRITE)
 def resume():
     GLOBAL().current_screen = 0
 main_menu_resume.set_f(resume)
@@ -79,12 +82,7 @@ def save_later_wrapper():
 keep_cards.set_f(save_later_wrapper)
 while GLOBAL().running:
 
-    card_speed = GLOBAL().get_dt_base()
-    card_rot_speed = GLOBAL().get_dt_rot_speed()
-    # SCREEN COLOR LERP
 
-    c = color_bg_sys.update(delta_time)
-    screen.fill(c)
 
     mouse_pos = pygame.mouse.get_pos()
     GLOBAL().is_mouse_moving = False
@@ -100,7 +98,16 @@ while GLOBAL().running:
                     GLOBAL().current_screen = 0
                 else: GLOBAL().current_screen = 1
 
+    card_speed = GLOBAL().get_dt_base()
+    card_rot_speed = GLOBAL().get_dt_rot_speed()
+    # SCREEN COLOR LERP
 
+    c = color_bg_sys.update(delta_time)
+    screen.fill(c)
+
+    #
+
+    screen.blit(vicinity_surface, vicinity_rect)
 
     if GLOBAL().current_screen == 1:
         screen.fill(main_screen_bg_color)
@@ -151,13 +158,13 @@ while GLOBAL().running:
     elif draw_cards:
         for _ in range(5 - len(in_hand)):
             c = draw_deck.draw_card()
-            c.lerp_pos(in_hand.start_pos,0, rot_speed=0)
+            c.lerp_pos(in_hand.start_pos, 0, rot_speed=0)
             in_hand.add_card(c)
         draw_cards = False
         in_hand.order_deck()
 
     if GLOBAL().is_card_active:
-        is_card_in_vicinity = vicinity_rect.collidepoint(mouse_pos)
+        is_card_in_vicinity = vicinity_rect.colliderect(GLOBAL().get_current().get_rect())
 
     poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space, skip=not is_card_in_vicinity)
     for i in range(len(in_hand)):

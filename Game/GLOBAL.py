@@ -1,4 +1,5 @@
 import pygame
+
 from Game.CardsAssetManager import CardsAssetManager
 
 
@@ -14,6 +15,8 @@ class GLOBAL:
             cls._instance.current = None
             cls._instance.time_held = 0.0
             cls._instance.high_to_low = True
+            cls._instance.BUTTON_OR_BG_SURFACE_LOC = "Game/Assets/General/button or surface.png"
+            cls._instance.BG_SURFACE_LOC = "Game/Assets/General/Wide bg.png"
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
             cls._instance.HEARTS_ASSET_LOC = "Game/Assets/Hearts"
