@@ -1,81 +1,56 @@
 import pygame
-import random
+
+from Game.GLOBAL import GLOBAL
+
 
 class COLORS:
 
-    BG_GREEN = (29, 145, 64)
-    BG_CYAN = (87, 158, 194)
-    BG_ORANGE = (204, 124, 82)
-    BG_YELLOW = (183, 191, 31)
-    BG_BLUE = (46, 31, 163)
-    BG_RED = (194, 94, 87)
+    BG_GREEN = (70, 128, 87)
+    BG_CYAN = (94, 142, 166)
+    BG_ORANGE = (176, 126, 100)
+    BG_YELLOW = (165, 168, 93)
+    BG_BLUE = (98, 90, 166)
+    BG_RED = (158, 90, 85)
 
-    BG_COLORS = [BG_GREEN, BG_ORANGE, BG_CYAN, BG_YELLOW, BG_BLUE, BG_RED]
+    BG_COLORS = [BG_GREEN, BG_CYAN,BG_BLUE, BG_ORANGE, BG_YELLOW, BG_RED]
+    WAIT_TIME = 60
+    SPEED = 18
 
-    def __init__(self, fps=60):
+    def __init__(self):
         self.BG_C = COLORS.BG_COLORS.copy()
         self.t = 0.0
         self.direction = 0.1
         self.dir = 1
-        self.fps = fps
+        self.current_color = self.BG_C[0]
+        self.to_color_index = 1
+        self.state = 0
+        # 0 is stay
+        # 1 is transitioning
 
-    def update(self, delta_time: float) -> pygame.Color:
-        screen_color = COLORS.lerp_colors(self.BG_C, self.t)
-        self.t += self.direction
-        if screen_color in self.BG_C:
-            old_color_index = 0
-            self.direction = delta_time / (self.fps * 100) * self.dir
-            for i, c in enumerate(self.BG_C):
-                if c == screen_color:
-                    old_color_index = i
-                    break
-            random.shuffle(self.BG_C)
-            for i, c in enumerate(self.BG_C):
-                if c == screen_color:
-                    self.BG_C[i] = self.BG_C[old_color_index]
-                    self.BG_C[old_color_index] = screen_color
-        else:
-            self.direction = delta_time / self.fps * self.dir
-
-        if self.t >= 1.0 or self.t <= 0.0:
-            self.dir *= -1
-
+    def update(self) -> pygame.Color:
+        if self.state > 1: self.state = 1
+        screen_color = (0, 0, 0)
+        if self.state == 1:
+            screen_color = COLORS.lerp_color(self.current_color, self.BG_C[self.to_color_index], GLOBAL().get_dt() * COLORS.SPEED)
+            if screen_color == self.BG_C[self.to_color_index]:
+                self.to_color_index = (self.to_color_index + 1) % len(self.BG_COLORS)
+                self.state = 0
+            self.current_color = screen_color
+        elif 0 <= self.state < 1:
+            screen_color = self.current_color
+            self.state += (1 / COLORS.WAIT_TIME) * GLOBAL().get_dt()
         return screen_color
 
 
 
     @staticmethod
     def lerp_color(color1, color2, t):
-
         t = max(0.0, min(1.0, t))
+
 
         r = int(color1[0] + (color2[0] - color1[0]) * t)
         g = int(color1[1] + (color2[1] - color1[1]) * t)
         b = int(color1[2] + (color2[2] - color1[2]) * t)
 
-        return pygame.Color(r, g, b)
+        return r, g, b
 
-    @staticmethod
-    def lerp_colors(colors: list[pygame.Color], t):
-        t = max(0.0, min(1.0, t))  # Clamp t between 0 and 1
-
-        num_colors = len(colors)
-        if num_colors < 2:
-            return colors[0] if num_colors > 0 else pygame.Color(0, 0, 0)  # Return black if no colors
-
-        segment_length = 1.0 / (num_colors - 1)
-
-        # Determine which segment we are in
-        segment_index = int(t / segment_length)
-
-        # Handle the case where t is exactly 1.0
-        if segment_index >= num_colors - 1:
-            return pygame.Color(colors[num_colors - 1])
-
-        # Calculate local t within the current segment
-        local_t = (t % segment_length) / segment_length
-
-        color1 = pygame.Color(colors[segment_index])
-        color2 = pygame.Color(colors[segment_index + 1])
-
-        return color1.lerp(color2, local_t)

@@ -52,7 +52,7 @@ cards_in_place = 0
 clicked_button = False
 
 
-color_bg_sys = COLORS(fps)
+color_bg_sys = COLORS()
 
 button_size_normal = [250, 90]
 BUTTON_SPRITE = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
@@ -102,7 +102,7 @@ while GLOBAL().running:
     card_rot_speed = GLOBAL().get_dt_rot_speed()
     # SCREEN COLOR LERP
 
-    c = color_bg_sys.update(delta_time)
+    c = color_bg_sys.update()
     screen.fill(c)
 
     #
