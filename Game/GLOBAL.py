@@ -17,6 +17,8 @@ class GLOBAL:
             cls._instance.high_to_low = True
             cls._instance.BUTTON_OR_BG_SURFACE_LOC = "Game/Assets/General/button or surface.png"
             cls._instance.BG_SURFACE_LOC = "Game/Assets/General/Wide bg.png"
+            cls._instance.BACK_DESIGN_LOC = "Game/Assets/General/Back Design.png"
+            cls._instance.FONT_LOC = "Game/Assets/Fonts/Barriecito-Regular.ttf"
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
             cls._instance.HEARTS_ASSET_LOC = "Game/Assets/Hearts"
@@ -53,6 +55,13 @@ class GLOBAL:
 
     def get_current(self):
         return self.current
+
+    @staticmethod
+    def get_center(r: list[int]):
+        return [r[0] + r[2] / 2, r[1] + r[3] / 2]
+
+
+
 
     def update_mouse(self):
         delta_time = self.delta_time

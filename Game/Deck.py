@@ -17,7 +17,7 @@ class Deck:
     def get_new_deck() -> list[Card]:
         cards: list[Card] = []
         for s in range(4):
-            for v in range(1, 13):
+            for v in range(1, 14):
                 c = Card(v, s)
                 cards.append(c)
         return cards.copy()

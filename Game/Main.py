@@ -7,6 +7,7 @@ from Game.Color import COLORS
 from Button import Button
 
 pygame.init()
+pygame.font.init()
 infoObject = pygame.display.Info()
 current_w, current_h = infoObject.current_w, infoObject.current_h
 
@@ -33,7 +34,6 @@ for i in range(12):
         pos = [decks_start_pos[0] + (space_between_decks[0] + Card.WIDTH) * (i-6), decks_start_pos[1] + space_between_decks[1] + Card.HEIGHT]
     decks.append(Deck([], pos))
 
-firstCard = draw_deck.draw_card()
 in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 save_deck = []
@@ -41,7 +41,7 @@ save_deck = []
 torque = 30
 space = 20
 t_width = ((Card.WIDTH + space) * 5 - space) + 60
-vicinity_rect = pygame.rect.Rect([current_w / 2 - (t_width+ space)/2, current_h - (Card.HEIGHT + 50), t_width, Card.HEIGHT + 100])
+vicinity_rect = pygame.rect.Rect([current_w / 2 - (t_width + space)/2, current_h - (Card.HEIGHT + 50), t_width, Card.HEIGHT + 100])
 vicinity_surface = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
 vicinity_surface = pygame.transform.smoothscale(vicinity_surface, (vicinity_rect.width, vicinity_rect.height))
 vicinity_surface.set_alpha(256)
@@ -80,6 +80,16 @@ def save_later_wrapper():
 
 
 keep_cards.set_f(save_later_wrapper)
+
+
+
+
+back_design_surface = pygame.image.load(GLOBAL().BACK_DESIGN_LOC).convert_alpha()
+back_design_surface = pygame.transform.smoothscale_by(back_design_surface, 0.5)
+
+card_count_font_obj = pygame.font.Font(GLOBAL().FONT_LOC, 32)
+
+
 while GLOBAL().running:
 
 
@@ -129,7 +139,7 @@ while GLOBAL().running:
     # GAME
 
     # Makes sure there are enough cards:
-    if len(draw_deck) >= 5:
+    if len(draw_deck) <= 5:
         # combine discard and draw deck and reshuffle
         draw_deck.add_cards(discard_deck.deck)
         discard_deck.clear()
@@ -138,6 +148,14 @@ while GLOBAL().running:
     if len(draw_deck) == 0:
         running = False
         print("IMPLEMENT FINISH CONDITION")
+
+    # Drawing the deck
+    for i in range(len(draw_deck)):
+        screen.blit(back_design_surface, [20, (current_h - Card.HEIGHT) / 2 - i])
+    card_hover_rect = pygame.Rect(20, (current_h - Card.HEIGHT) / 2 - len(draw_deck) - 1, Card.WIDTH , Card.HEIGHT)
+    if card_hover_rect.collidepoint(mouse_pos):
+        card_count_font_obj_s = card_count_font_obj.render(f"{len(draw_deck)} / 52", True, (255, 255, 255))
+        screen.blit(card_count_font_obj_s, GLOBAL().get_center([20, (current_h - Card.HEIGHT) / 2 - 51, Card.WIDTH - card_count_font_obj_s.get_size()[0], Card.HEIGHT]))
 
     if clicked_button and not is_bogey_turn:
         discard_deck.add_cards(in_hand.deck.copy())
