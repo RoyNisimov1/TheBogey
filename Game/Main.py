@@ -1,6 +1,7 @@
 
 import pygame
 from Game.GLOBAL import GLOBAL
+from Game.Blob import Blob
 from Game.Card import Card
 from Game.Deck import Deck
 from Game.Color import COLORS
@@ -90,6 +91,11 @@ back_design_surface = pygame.transform.smoothscale_by(back_design_surface, 0.5)
 card_count_font_obj = pygame.font.Font(GLOBAL().FONT_LOC, 32)
 
 
+blob_group = pygame.sprite.Group()
+# for _ in range(10):
+#     blob_group.add(Blob())
+
+
 while GLOBAL().running:
 
 
@@ -114,7 +120,8 @@ while GLOBAL().running:
 
     c = color_bg_sys.update()
     screen.fill(c)
-
+    blob_group.update()
+    blob_group.draw(screen)
     #
 
     screen.blit(vicinity_surface, vicinity_rect)
@@ -154,7 +161,7 @@ while GLOBAL().running:
         screen.blit(back_design_surface, [20, (current_h - Card.HEIGHT) / 2 - i])
     card_hover_rect = pygame.Rect(20, (current_h - Card.HEIGHT) / 2 - len(draw_deck) - 1, Card.WIDTH , Card.HEIGHT)
     if card_hover_rect.collidepoint(mouse_pos):
-        card_count_font_obj_s = card_count_font_obj.render(f"{len(draw_deck)} / 52", True, (255, 255, 255))
+        card_count_font_obj_s = card_count_font_obj.render(f"{len(draw_deck)} / 52", True, (0,0,0))
         screen.blit(card_count_font_obj_s, GLOBAL().get_center([20, (current_h - Card.HEIGHT) / 2 - 51, Card.WIDTH - card_count_font_obj_s.get_size()[0], Card.HEIGHT]))
 
     if clicked_button and not is_bogey_turn:

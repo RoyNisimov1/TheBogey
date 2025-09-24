@@ -8,5 +8,5 @@ class CardsAssetManager:
 
     def get(self, index: int = 0, scale=1):
         img = pygame.image.load(self.src + f"/{index}.png").convert_alpha()
-        img = pygame.transform.scale_by(img, scale)
+        img = pygame.transform.smoothscale_by(img, scale)
         return img

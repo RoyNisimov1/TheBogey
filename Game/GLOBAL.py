@@ -18,6 +18,7 @@ class GLOBAL:
             cls._instance.BUTTON_OR_BG_SURFACE_LOC = "Game/Assets/General/button or surface.png"
             cls._instance.BG_SURFACE_LOC = "Game/Assets/General/Wide bg.png"
             cls._instance.BACK_DESIGN_LOC = "Game/Assets/General/Back Design.png"
+            cls._instance.BLOB_LOC = "Game/Assets/General/Blob.png"
             cls._instance.FONT_LOC = "Game/Assets/Fonts/Barriecito-Regular.ttf"
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
@@ -35,6 +36,8 @@ class GLOBAL:
 
     def get_dt_base(self):
         return self.BASE_SPEED * self.get_dt()
+
+
 
     def get_dt_rot_speed(self):
         return self.ROTATION_SPEED * self.get_dt()
