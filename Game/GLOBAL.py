@@ -24,6 +24,8 @@ class GLOBAL:
             cls._instance.CLUBS_MANAGER = CardsAssetManager(cls._instance.CLUBS_ASSET_LOC)
             cls._instance.HEARTS_ASSET_LOC = "Game/Assets/Hearts"
             cls._instance.HEARTS_MANAGER = CardsAssetManager(cls._instance.HEARTS_ASSET_LOC)
+            cls._instance.SPADES_ASSET_LOC = "Game/Assets/Spades"
+            cls._instance.SPADES_MANAGER = CardsAssetManager(cls._instance.SPADES_ASSET_LOC)
             cls._instance.BASE_SPEED = 10
             cls._instance.ROTATION_SPEED = 20
             cls._instance.TORQUE = 30

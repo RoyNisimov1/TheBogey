@@ -33,7 +33,7 @@ class Card:
         #   13: King
         self.suit = suit
         self.value = value
-        self.surface = self.get_surface_og()
+        self.surface = self.load_surface()
         if pos is None: pos = [0, 0]
         self.active = False
         self.x = pos[0]
@@ -176,9 +176,11 @@ class Card:
         s.blit(text, [100, 140])
 
         if self.suit == 0:
-            s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
+            s = GLOBAL().CLUBS_MANAGER.get(self.value, 1)
         elif self.suit == 1:
-            s = GLOBAL().HEARTS_MANAGER.get(self.value, 0.5)
+            s = GLOBAL().HEARTS_MANAGER.get(self.value,  1)
+        elif self.suit == 2:
+            s = GLOBAL().SPADES_MANAGER.get(self.value, 1)
         return s
 
 
@@ -203,6 +205,8 @@ class Card:
             s = GLOBAL().CLUBS_MANAGER.get(self.value, 0.5)
         elif self.suit == 1:
             s = GLOBAL().HEARTS_MANAGER.get(self.value, 0.5)
+        elif self.suit == 2:
+            s = GLOBAL().SPADES_MANAGER.get(self.value, 0.5)
         return s
 
     def __repr__(self):

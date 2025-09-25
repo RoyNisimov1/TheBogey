@@ -1,5 +1,7 @@
 
 import pygame
+from pygame import BLEND_RGB_ADD, BLEND_RGBA_MULT, BLEND_RGB_SUB
+
 from Game.GLOBAL import GLOBAL
 from Game.Blob import Blob
 from Game.Card import Card
@@ -91,9 +93,7 @@ back_design_surface = pygame.transform.smoothscale_by(back_design_surface, 0.5)
 card_count_font_obj = pygame.font.Font(GLOBAL().FONT_LOC, 32)
 
 
-blob_group = pygame.sprite.Group()
-# for _ in range(10):
-#     blob_group.add(Blob())
+
 
 
 while GLOBAL().running:
@@ -119,9 +119,8 @@ while GLOBAL().running:
     # SCREEN COLOR LERP
 
     c = color_bg_sys.update()
+
     screen.fill(c)
-    blob_group.update()
-    blob_group.draw(screen)
     #
 
     screen.blit(vicinity_surface, vicinity_rect)
@@ -132,6 +131,7 @@ while GLOBAL().running:
         for i, button in enumerate(main_menu_holder):
             button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) *(space + button.size[1]))/ 2 + i * (space + button.size[1]))])
             button.update(screen)
+
 
 
         pygame.display.flip()
@@ -179,7 +179,15 @@ while GLOBAL().running:
             in_hand.add_cards(save_deck.copy())
             save_deck.clear()
             draw_cards = True
-        ...
+        else:
+            # CHECK IF THE BOGEY CAN BE ADDED TO ANY DECK
+            dont_stop_game = False
+            for i, d in enumerate(decks):
+                if d.can_add_card(in_hand.deck[0]):
+                    dont_stop_game = True
+            if not dont_stop_game:
+                # IMPLEMENT LOSE CONDITION
+                GLOBAL().running = False
     elif draw_cards:
         for _ in range(5 - len(in_hand)):
             c = draw_deck.draw_card()
@@ -220,6 +228,7 @@ while GLOBAL().running:
     for card in in_hand.deck:
         if card is not None:
             card.update(screen)
+
 
 
 
