@@ -1,9 +1,9 @@
+import math
 
 import pygame
-from pygame import BLEND_RGB_ADD, BLEND_RGBA_MULT, BLEND_RGB_SUB
 
 from Game.GLOBAL import GLOBAL
-from Game.Blob import Blob
+from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
 from Game.Deck import Deck
 from Game.Color import COLORS
@@ -13,6 +13,9 @@ pygame.init()
 pygame.font.init()
 infoObject = pygame.display.Info()
 current_w, current_h = infoObject.current_w, infoObject.current_h
+CENTER = current_w/2, current_h/2
+CAM_DRAG_OFFSET = 0.1
+CAM_SPEED = 15
 
 
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -116,6 +119,20 @@ while GLOBAL().running:
 
     card_speed = GLOBAL().get_dt_base()
     card_rot_speed = GLOBAL().get_dt_rot_speed()
+
+    # CAM
+
+    rect_cam_offset = pygame.Rect([75, 80, current_w-150, current_h])
+    rect_cam_offset = GLOBAL().create_rect(rect_cam_offset)
+    if not (rect_cam_offset.collidepoint(mouse_pos)):
+        cam_to = ((mouse_pos[0] - CENTER[0]) * -CAM_DRAG_OFFSET, (mouse_pos[1] - CENTER[1]) * -CAM_DRAG_OFFSET)
+        GLOBAL().camera_offset = (LerpFuncs.LERP(GLOBAL().camera_offset[0], cam_to[0], CAM_SPEED * GLOBAL().get_dt())), (
+            LerpFuncs.LERP(GLOBAL().camera_offset[1], cam_to[1], CAM_SPEED * GLOBAL().get_dt()))
+
+    else:
+        GLOBAL().camera_offset = (LerpFuncs.LERP(GLOBAL().camera_offset[0], 0, CAM_SPEED * GLOBAL().get_dt())), (LerpFuncs.LERP(GLOBAL().camera_offset[1], 0, CAM_SPEED * GLOBAL().get_dt()))
+
+
     # SCREEN COLOR LERP
 
     c = color_bg_sys.update()
@@ -123,13 +140,13 @@ while GLOBAL().running:
     screen.fill(c)
     #
 
-    screen.blit(vicinity_surface, vicinity_rect)
+    screen.blit(vicinity_surface, GLOBAL().create_rect(vicinity_rect))
 
     if GLOBAL().current_screen == 1:
         screen.fill(main_screen_bg_color)
         # draw buttons
         for i, button in enumerate(main_menu_holder):
-            button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) *(space + button.size[1]))/ 2 + i * (space + button.size[1]))])
+            button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) *(space + button.size[1])) / 2 + i * (space + button.size[1]))])
             button.update(screen)
 
 
@@ -157,12 +174,15 @@ while GLOBAL().running:
         print("IMPLEMENT FINISH CONDITION")
 
     # Drawing the deck
+    r = None
     for i in range(len(draw_deck)):
-        screen.blit(back_design_surface, [20, (current_h - Card.HEIGHT) / 2 - i])
-    card_hover_rect = pygame.Rect(20, (current_h - Card.HEIGHT) / 2 - len(draw_deck) - 1, Card.WIDTH , Card.HEIGHT)
+        r = pygame.Rect([20, (current_h - Card.HEIGHT) / 2 - i, Card.WIDTH, Card.HEIGHT])
+        screen.blit(back_design_surface, GLOBAL().create_rect(r))
+    card_hover_rect = r
     if card_hover_rect.collidepoint(mouse_pos):
-        card_count_font_obj_s = card_count_font_obj.render(f"{len(draw_deck)} / 52", True, (0,0,0))
-        screen.blit(card_count_font_obj_s, GLOBAL().get_center([20, (current_h - Card.HEIGHT) / 2 - 51, Card.WIDTH - card_count_font_obj_s.get_size()[0], Card.HEIGHT]))
+        card_count_font_obj_s = card_count_font_obj.render(f"{len(draw_deck)} / 52", True, (0, 0, 0))
+        r = pygame.Rect([card_hover_rect.topleft[0] + Card.WIDTH / 2 - card_count_font_obj_s.size[0] / 2, card_hover_rect.topleft[1] + Card.HEIGHT / 2 - card_count_font_obj_s.size[1] / 2, card_count_font_obj_s.size[0], card_count_font_obj_s.size[1]])
+        screen.blit(card_count_font_obj_s, GLOBAL().create_rect(r))
 
     if clicked_button and not is_bogey_turn:
         discard_deck.add_cards(in_hand.deck.copy())

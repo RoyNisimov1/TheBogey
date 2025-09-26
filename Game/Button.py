@@ -1,5 +1,7 @@
 import pygame
 
+from Game.GLOBAL import GLOBAL
+
 
 class Button:
 
@@ -33,7 +35,6 @@ class Button:
             s.fill((255, 255, 255))
         else:
             s = self.bg_sprite
-
         font = pygame.font.Font(self.font, self.font_size)
         text = font.render(self.text, True, (0, 0, 0), wraplength=400)
         s.blit(text, [(self.size[0]-len(self.text)*5)//2, self.size[1]//2])
@@ -51,7 +52,7 @@ class Button:
         if self.clicked:
             s = pygame.transform.scale_by(s, 0.95)
         scaled_rect = s.get_rect(center=self.get_center())
-        screen.blit(s, scaled_rect)
+        screen.blit(s, GLOBAL().create_rect(scaled_rect))
         return r
 
     def set_pos(self, pos: list[int]):

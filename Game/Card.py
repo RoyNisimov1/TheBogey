@@ -188,10 +188,10 @@ class Card:
         return self.x, self.y
 
     def get_rect(self):
-        return pygame.Rect([self.get_pos()[0], self.get_pos()[1], Card.WIDTH, Card.HEIGHT])
+        return GLOBAL().create_rect(pygame.Rect([self.get_pos()[0], self.get_pos()[1], Card.WIDTH, Card.HEIGHT]))
 
     def get_center(self):
-        return self.x+Card.WIDTH/2, self.y+Card.HEIGHT/2
+        return self.get_rect().center
 
     def load_surface(self) -> pygame.Surface:
         # Card aspect ratio is 2.5/3.5

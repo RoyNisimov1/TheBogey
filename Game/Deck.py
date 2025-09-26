@@ -36,8 +36,7 @@ class Deck:
 
     def gyzmos(self, screen):
         s = self.get_top_card_surface()
-        pos = self.start_pos
-        screen.blit(s, pos)
+        screen.blit(s, self.get_rect())
     
     def order_deck(self):
         self.deck.sort()
@@ -57,7 +56,8 @@ class Deck:
         return poses
 
     def get_rect(self):
-        return pygame.Rect([self.start_pos[0], self.start_pos[1], Card.WIDTH, Card.HEIGHT])
+        return GLOBAL().create_rect(pygame.Rect([self.start_pos[0], self.start_pos[1], Card.WIDTH, Card.HEIGHT]))
+
 
     def on_mouse_hover(self):
         ...

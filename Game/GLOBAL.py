@@ -34,7 +34,14 @@ class GLOBAL:
             cls._instance.is_mouse_moving = False
             cls._instance.current_screen = 0
             cls._instance.running = True
+            
+            cls._instance.camera_offset = (0,0)
+
         return cls._instance
+
+    def create_rect(self, rect: pygame.rect.Rect):
+        r = pygame.rect.Rect([rect.topleft[0] + self.camera_offset[0], rect.topleft[1] + self.camera_offset[1], rect.size[0], rect.size[1]])
+        return r
 
     def get_dt_base(self):
         return self.BASE_SPEED * self.get_dt()
