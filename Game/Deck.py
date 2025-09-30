@@ -10,8 +10,9 @@ class Deck:
 
     def __init__(self, cards: list[Card], start_pos: list[int] = None):
         self.deck: list[Card] = cards
-        if start_pos is None: start_pos = [0,0]
+        if start_pos is None: start_pos = [0, 0]
         self.start_pos = start_pos
+
 
     @staticmethod
     def get_new_deck() -> list[Card]:
@@ -109,8 +110,7 @@ class Deck:
 
     def get_top_card_surface(self):
         if len(self.deck) == 0:
-            s = pygame.Surface([Card.WIDTH, Card.HEIGHT])
-            s.fill((0, 0, 0))
+            s = GLOBAL().EMPTY_DECK_SURFACE_SCALED_DOWN_05
             return s
         s = self.deck[len(self.deck)-1]
         s = s.surface

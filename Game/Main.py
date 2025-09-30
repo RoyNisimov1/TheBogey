@@ -1,6 +1,11 @@
-import math
 
 import pygame
+pygame.init()
+pygame.font.init()
+infoObject = pygame.display.Info()
+current_w, current_h = infoObject.current_w, infoObject.current_h
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+pygame.display.set_caption("The Bogey")
 
 from Game.GLOBAL import GLOBAL
 from Game.LerpFuncs import LerpFuncs
@@ -9,21 +14,18 @@ from Game.Deck import Deck
 from Game.Color import COLORS
 from Button import Button
 
-pygame.init()
-pygame.font.init()
-infoObject = pygame.display.Info()
-current_w, current_h = infoObject.current_w, infoObject.current_h
+
+GLOBAL().set_dim(current_w, current_h)
 CENTER = current_w/2, current_h/2
 CAM_DRAG_OFFSET = 0.1
 CAM_SPEED = 15
 
 
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-pygame.display.set_caption("The Bogey")
+
 
 
 clock = pygame.time.Clock()
-fps: int = 1000
+fps: int = 240
 delta_time: float = 0.1
 
 
@@ -47,7 +49,7 @@ save_deck = []
 torque = 30
 space = 20
 t_width = ((Card.WIDTH + space) * 5 - space) + 60
-vicinity_rect = pygame.rect.Rect([current_w / 2 - (t_width + space)/2, current_h - (Card.HEIGHT + 50), t_width, Card.HEIGHT + 100])
+vicinity_rect = pygame.rect.Rect([current_w / 2 - (t_width + 30)/2, current_h - (Card.HEIGHT + 50), t_width, Card.HEIGHT + 100])
 vicinity_surface = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
 vicinity_surface = pygame.transform.smoothscale(vicinity_surface, (vicinity_rect.width, vicinity_rect.height))
 vicinity_surface.set_alpha(256)
@@ -61,16 +63,22 @@ clicked_button = False
 color_bg_sys = COLORS()
 
 button_size_normal = [250, 90]
-BUTTON_SPRITE = pygame.image.load(GLOBAL().BG_SURFACE_LOC).convert_alpha()
-keep_cards = Button(text="Keep Cards", font_size=10, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE)
+BUTTON_SPRITE = GLOBAL().BUTTON_250_90_SURFACE
+FONT_SIZE = 40
+COLOR = (255, 255, 255)
+
+FONT = GLOBAL().FONT_LOC
+keep_cards = Button(text="Keep Cards", font=FONT, font_size=FONT_SIZE, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE, color=COLOR)
 
 
+
+MAIN_MENU_SPACING = 40
 main_screen_bg_color = (97, 81, 79)
-main_menu_quit = Button(text="Quit", font_size=10, size=button_size_normal, bg_sprite=BUTTON_SPRITE)
+main_menu_quit = Button(text="Quit", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=COLOR)
 def quite():
     GLOBAL().running = False
 main_menu_quit.set_f(quite)
-main_menu_resume = Button(text="Resume", font_size=10, size=button_size_normal, bg_sprite=BUTTON_SPRITE)
+main_menu_resume = Button(text="Resume", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=COLOR)
 def resume():
     GLOBAL().current_screen = 0
 main_menu_resume.set_f(resume)
@@ -87,6 +95,10 @@ def save_later_wrapper():
 
 keep_cards.set_f(save_later_wrapper)
 
+for i, button in enumerate(main_menu_holder):
+    button.set_pos([((current_w - button.size[0]) / 2), (
+                (current_h - len(main_menu_holder) * (MAIN_MENU_SPACING + button.size[1])) / 2 + i * (MAIN_MENU_SPACING + button.size[1]))])
+
 
 
 
@@ -95,14 +107,14 @@ back_design_surface = pygame.transform.smoothscale_by(back_design_surface, 0.5)
 
 card_count_font_obj = pygame.font.Font(GLOBAL().FONT_LOC, 32)
 
-
+VIGNETTE_FILE_LOC = "Game/Assets/General/Vignette.png"
+vignette_surf = pygame.image.load(VIGNETTE_FILE_LOC).convert_alpha()
+vignette_surf = pygame.transform.smoothscale(vignette_surf, [current_w, current_h]).convert_alpha()
+vignette_surf.set_alpha(100)
 
 
 
 while GLOBAL().running:
-
-
-
     mouse_pos = pygame.mouse.get_pos()
     GLOBAL().is_mouse_moving = False
     for event in pygame.event.get():
@@ -138,6 +150,7 @@ while GLOBAL().running:
     c = color_bg_sys.update()
 
     screen.fill(c)
+    screen.blit(vignette_surf, [0, 0])
     #
 
     screen.blit(vicinity_surface, GLOBAL().create_rect(vicinity_rect))
@@ -146,7 +159,7 @@ while GLOBAL().running:
         screen.fill(main_screen_bg_color)
         # draw buttons
         for i, button in enumerate(main_menu_holder):
-            button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) *(space + button.size[1])) / 2 + i * (space + button.size[1]))])
+            # button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) * (space + button.size[1])) / 2 + i * (space + button.size[1]))])
             button.update(screen)
 
 
@@ -166,8 +179,9 @@ while GLOBAL().running:
     if len(draw_deck) <= 5:
         # combine discard and draw deck and reshuffle
         draw_deck.add_cards(discard_deck.deck)
-        discard_deck.clear()
+        discard_deck.deck.clear()
         draw_deck.shuffle_deck()
+
 
     if len(draw_deck) == 0:
         running = False

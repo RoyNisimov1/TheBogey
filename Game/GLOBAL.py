@@ -16,8 +16,15 @@ class GLOBAL:
             cls._instance.time_held = 0.0
             cls._instance.high_to_low = True
             cls._instance.BUTTON_OR_BG_SURFACE_LOC = "Game/Assets/General/button or surface.png"
+            cls._instance.BUTTON_LOC = "Game/Assets/General/Button.png"
+            cls._instance.BUTTON_SURFACE = pygame.image.load(cls._instance.BUTTON_LOC).convert_alpha()
+            cls._instance.BUTTON_250_90_LOC = "Game/Assets/General/Button250-90.png"
+            cls._instance.BUTTON_250_90_SURFACE = pygame.image.load(cls._instance.BUTTON_250_90_LOC).convert_alpha()
             cls._instance.BG_SURFACE_LOC = "Game/Assets/General/Wide bg.png"
             cls._instance.BACK_DESIGN_LOC = "Game/Assets/General/Back Design.png"
+            cls._instance.EMPTY_DECK_DESIGN_LOC = "Game/Assets/General/Empty Deck.png"
+            cls._instance.EMPTY_DECK_SURFACE = pygame.image.load(cls._instance.EMPTY_DECK_DESIGN_LOC).convert_alpha()
+            cls._instance.EMPTY_DECK_SURFACE_SCALED_DOWN_05 = pygame.transform.smoothscale_by(cls._instance.EMPTY_DECK_SURFACE, 0.5)
             cls._instance.BLOB_LOC = "Game/Assets/General/Blob.png"
             cls._instance.FONT_LOC = "Game/Assets/Fonts/Barriecito-Regular.ttf"
             cls._instance.CLUBS_ASSET_LOC = "Game/Assets/Clubs"
@@ -34,7 +41,7 @@ class GLOBAL:
             cls._instance.is_mouse_moving = False
             cls._instance.current_screen = 0
             cls._instance.running = True
-            
+
             cls._instance.camera_offset = (0,0)
 
         return cls._instance
@@ -42,6 +49,10 @@ class GLOBAL:
     def create_rect(self, rect: pygame.rect.Rect):
         r = pygame.rect.Rect([rect.topleft[0] + self.camera_offset[0], rect.topleft[1] + self.camera_offset[1], rect.size[0], rect.size[1]])
         return r
+
+    def set_dim(self, w, h):
+        self.current_w = w
+        self.current_h = h
 
     def get_dt_base(self):
         return self.BASE_SPEED * self.get_dt()

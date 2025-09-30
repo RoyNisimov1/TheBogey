@@ -1,17 +1,20 @@
 import pygame
 
 from Game.GLOBAL import GLOBAL
+from Game.LerpFuncs import LerpFuncs
 
 
 class Button:
+
+    UP = 20
+    SPEED = 20
 
     @staticmethod
     def void_func_wrapper(*args, **kwargs):
         return
 
-    def __init__(self, pos=None, text="", font="freesansbold.ttf", font_size=32, f=void_func_wrapper, bg_sprite = None, size=None):
-
-
+    def __init__(self, pos=None, text="", font="freesansbold.ttf", font_size=32, f=void_func_wrapper, bg_sprite = None, size=None, color = (0,0,0)):
+        self.color = color
         if size is None:
             size = [50, 30]
         self.size = size
@@ -25,28 +28,52 @@ class Button:
         self.function = f
         self.font = font
         self.clicked = False
+        font = pygame.font.Font(self.font, self.font_size)
+        text = font.render(self.text, True, self.color)
+        self.font_surface = text
+        self.rendered_bg = None
+        self.hover = False
+        self.move_to_pos = self.pos.copy()
+        self.move_to_pos = (self.move_to_pos[0], self.move_to_pos[1] - Button.UP)
+        self.rest_pos = self.pos.copy()
 
-    def set_f(self, f):
-        self.function = f
-
-    def update(self, screen: pygame.Surface, *args, **kwargs):
+    def create_render_bg(self):
         if self.bg_sprite is None:
             s = pygame.Surface(self.size)
             s.fill((255, 255, 255))
         else:
             s = self.bg_sprite
         font = pygame.font.Font(self.font, self.font_size)
-        text = font.render(self.text, True, (0, 0, 0), wraplength=400)
-        s.blit(text, [(self.size[0]-len(self.text)*5)//2, self.size[1]//2])
+        text = font.render(self.text, True, self.color)
+        r = text.get_rect()
+        r.center = self.size[0] / 2, self.size[1] / 2
+        s.blit(text, r)
+        self.rendered_bg = s
+
+
+    def set_f(self, f):
+        self.function = f
+
+    def update(self, screen: pygame.Surface, *args, **kwargs):
+        if self.rendered_bg is None:
+            self.create_render_bg()
+        s = self.rendered_bg
         mouse_pos = pygame.mouse.get_pos()
         r = None
-        if self.get_rect().collidepoint(mouse_pos):
+        self.hover = self.get_rect().collidepoint(mouse_pos)
+        if self.hover:
+
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
             if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
                 self.clicked = False
                 if self.function is not None:
                     r = self.function(*args, **kwargs)
+            self.pos = LerpFuncs.LERPPos(self.pos, self.move_to_pos, GLOBAL().get_dt()*Button.SPEED)
+        else:
+            self.pos = LerpFuncs.LERPPos(self.pos, self.rest_pos, GLOBAL().get_dt()*Button.SPEED)
+
+
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
         if self.clicked:
@@ -57,6 +84,9 @@ class Button:
 
     def set_pos(self, pos: list[int]):
         self.pos = pos
+        self.move_to_pos = self.pos.copy()
+        self.move_to_pos = (self.move_to_pos[0], self.move_to_pos[1] - Button.UP)
+        self.rest_pos = self.pos.copy()
 
     def get_center(self):
         return [self.pos[0] + self.size[0] / 2, self.pos[1] + self.size[1] / 2]

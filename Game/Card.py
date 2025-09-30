@@ -11,8 +11,8 @@ class Card:
 
     WIDTH = 200
     HEIGHT = 280
-    SELECTED_SCALE_UP = 1.1
     BASE_SCALE = 0.5
+    SELECTED_SCALE_UP = BASE_SCALE * 1.2
     SPEED = 5
     SCALE_UP_SPEED = 5
 
@@ -48,7 +48,8 @@ class Card:
         self.clicked = False
         self.scale_up_speed = scale_up_speed
         self.rotation = 0 # in degs
-
+        self.current_scale = 1
+        self.og_surf = self.get_surface_og()
 
 
 
@@ -113,14 +114,22 @@ class Card:
                     if not self.clicked:
                         self.selected = not self.selected
                         self.clicked = True
-        s = self.surface
+
+        s = pygame.transform.smoothscale_by(self.og_surf, self.current_scale)
         center_s = self.get_center()
 
         if self.selected:
             self.lerp_pos((self.rest_pos[0], self.rest_pos[1] - 40), 3, rot_speed=0)
 
+        if self.active:
+            self.current_scale = LerpFuncs.LERP(self.current_scale, Card.SELECTED_SCALE_UP, GLOBAL().get_dt() * Card.SCALE_UP_SPEED)
+        else:
+            self.current_scale = LerpFuncs.LERP(self.current_scale, Card.BASE_SCALE, GLOBAL().get_dt() * Card.SCALE_UP_SPEED)
+
+
         s = pygame.transform.rotate(s, self.rotation)
         rect = s.get_rect(center=center_s)
+
         screen.blit(s, rect)
         self.priority = 0
 
