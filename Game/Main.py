@@ -63,22 +63,25 @@ clicked_button = False
 color_bg_sys = COLORS()
 
 button_size_normal = [250, 90]
-BUTTON_SPRITE = GLOBAL().BUTTON_250_90_SURFACE
+# BUTTON_SPRITE = GLOBAL().BUTTON_250_90_SURFACE
+BUTTON_SPRITE = None
+BUTTON_COLOR = "#4298BD"
+BUTTON_COLOR_HOVER = "#BD6742"
 FONT_SIZE = 40
 COLOR = (255, 255, 255)
 
 FONT = GLOBAL().FONT_LOC
-keep_cards = Button(text="Keep Cards", font=FONT, font_size=FONT_SIZE, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE, color=COLOR)
+keep_cards = Button(text="Keep Cards", font=FONT, font_size=FONT_SIZE, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE, color=BUTTON_COLOR, hover_color=BUTTON_COLOR_HOVER)
 
 
 
 MAIN_MENU_SPACING = 40
 main_screen_bg_color = (97, 81, 79)
-main_menu_quit = Button(text="Quit", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=COLOR)
+main_menu_quit = Button(text="Quit", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=BUTTON_COLOR, hover_color=BUTTON_COLOR_HOVER)
 def quite():
     GLOBAL().running = False
 main_menu_quit.set_f(quite)
-main_menu_resume = Button(text="Resume", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=COLOR)
+main_menu_resume = Button(text="Resume", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=BUTTON_COLOR, hover_color=BUTTON_COLOR_HOVER)
 def resume():
     GLOBAL().current_screen = 0
 main_menu_resume.set_f(resume)

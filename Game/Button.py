@@ -13,8 +13,10 @@ class Button:
     def void_func_wrapper(*args, **kwargs):
         return
 
-    def __init__(self, pos=None, text="", font="freesansbold.ttf", font_size=32, f=void_func_wrapper, bg_sprite = None, size=None, color = (0,0,0)):
+    def __init__(self, pos=None, text="", font="freesansbold.ttf", font_size=32, f=void_func_wrapper, bg_sprite = None, size=None, color=(0, 0, 0), hover_color=(0, 0, 0), text_color=(0, 0, 0)):
         self.color = color
+        self.hover_color = hover_color
+        self.text_color = text_color
         if size is None:
             size = [50, 30]
         self.size = size
@@ -37,14 +39,21 @@ class Button:
         self.move_to_pos = (self.move_to_pos[0], self.move_to_pos[1] - Button.UP)
         self.rest_pos = self.pos.copy()
 
+
     def create_render_bg(self):
         if self.bg_sprite is None:
-            s = pygame.Surface(self.size)
-            s.fill((255, 255, 255))
+            if not self.hover:
+                s = pygame.Surface(self.size, pygame.SRCALPHA).convert_alpha()
+                r = s.get_rect()
+                pygame.draw.rect(s, self.color, r, border_radius=12)
+            else:
+                s = pygame.Surface(self.size, pygame.SRCALPHA).convert_alpha()
+                r = s.get_rect()
+                pygame.draw.rect(s, self.hover_color, r, border_radius=12)
         else:
             s = self.bg_sprite
         font = pygame.font.Font(self.font, self.font_size)
-        text = font.render(self.text, True, self.color)
+        text = font.render(self.text, True, self.text_color)
         r = text.get_rect()
         r.center = self.size[0] / 2, self.size[1] / 2
         s.blit(text, r)
@@ -60,9 +69,11 @@ class Button:
         s = self.rendered_bg
         mouse_pos = pygame.mouse.get_pos()
         r = None
-        self.hover = self.get_rect().collidepoint(mouse_pos)
+        colliding = self.get_rect().collidepoint(mouse_pos)
+        if self.hover != colliding:
+            self.hover = self.get_rect().collidepoint(mouse_pos)
+            self.create_render_bg()
         if self.hover:
-
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
             if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
