@@ -38,6 +38,7 @@ class Button:
         self.move_to_pos = self.pos.copy()
         self.move_to_pos = (self.move_to_pos[0], self.move_to_pos[1] - Button.UP)
         self.rest_pos = self.pos.copy()
+        self.dynamic_add = 0
 
 
     def create_render_bg(self):
@@ -69,9 +70,11 @@ class Button:
         s = self.rendered_bg
         mouse_pos = pygame.mouse.get_pos()
         r = None
-        colliding = self.get_rect().collidepoint(mouse_pos)
+        colliding_rect = self.get_rect()
+        colliding_rect.height += self.dynamic_add
+        colliding = colliding_rect.collidepoint(mouse_pos)
         if self.hover != colliding:
-            self.hover = self.get_rect().collidepoint(mouse_pos)
+            self.hover = colliding
             self.create_render_bg()
         if self.hover:
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
@@ -81,9 +84,10 @@ class Button:
                 if self.function is not None:
                     r = self.function(*args, **kwargs)
             self.pos = LerpFuncs.LERPPos(self.pos, self.move_to_pos, GLOBAL().get_dt()*Button.SPEED)
+            self.dynamic_add = self.rest_pos[1] - self.pos[1]
         else:
             self.pos = LerpFuncs.LERPPos(self.pos, self.rest_pos, GLOBAL().get_dt()*Button.SPEED)
-
+            self.dynamic_add = self.rest_pos[1] - self.pos[1]
 
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False

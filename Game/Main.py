@@ -1,4 +1,4 @@
-
+# --------------------- PYGAME INIT ----------------------------- #
 import pygame
 pygame.init()
 pygame.font.init()
@@ -6,7 +6,7 @@ infoObject = pygame.display.Info()
 current_w, current_h = infoObject.current_w, infoObject.current_h
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption("The Bogey")
-
+# --------------------- Imports --------------------------------- #
 from Game.GLOBAL import GLOBAL
 from Game.LerpFuncs import LerpFuncs
 from Game.Card import Card
@@ -14,22 +14,22 @@ from Game.Deck import Deck
 from Game.Color import COLORS
 from Button import Button
 
-
+# --------------------- GLOBAL AND CAMERA INIT ------------------ #
 GLOBAL().set_dim(current_w, current_h)
 CENTER = current_w/2, current_h/2
 CAM_DRAG_OFFSET = 0.1
 CAM_SPEED = 15
 
 
-
+# --------------------- CLOCK, DELTATIME, FPS CAP INIT ---------- #
 
 
 clock = pygame.time.Clock()
 fps: int = 240
 delta_time: float = 0.1
 
+# --------------------- DECKS INIT ------------------------------ #
 
-# Game related
 draw_deck = Deck(Deck.get_new_deck())
 draw_deck.shuffle_deck()
 is_bogey_turn = False
@@ -46,6 +46,7 @@ in_hand = Deck([], start_pos=[20, current_h - 300])
 discard_deck = Deck([])
 save_deck = []
 
+# --------------------- VICINITY RECT INIT ---------------------- #
 torque = 30
 space = 20
 t_width = ((Card.WIDTH + space) * 5 - space) + 60
@@ -59,13 +60,15 @@ draw_cards = True
 cards_in_place = 0
 clicked_button = False
 
-
+# --------------------- BG INIT ----------------------------- #
 color_bg_sys = COLORS()
 
+# --------------------- BUTTONGS INIT ----------------------------- #
 button_size_normal = [250, 90]
 # BUTTON_SPRITE = GLOBAL().BUTTON_250_90_SURFACE
 BUTTON_SPRITE = None
 BUTTON_COLOR = "#4298BD"
+#BUTTON_COLOR = "#71738E"
 BUTTON_COLOR_HOVER = "#BD6742"
 FONT_SIZE = 40
 COLOR = (255, 255, 255)
@@ -74,7 +77,7 @@ FONT = GLOBAL().FONT_LOC
 keep_cards = Button(text="Keep Cards", font=FONT, font_size=FONT_SIZE, size=button_size_normal, pos=[current_w-300, current_h-100], bg_sprite=BUTTON_SPRITE, color=BUTTON_COLOR, hover_color=BUTTON_COLOR_HOVER)
 
 
-
+# --------------------- Escape Menu INIT ----------------------------- #
 MAIN_MENU_SPACING = 40
 main_screen_bg_color = (97, 81, 79)
 main_menu_quit = Button(text="Quit", font=FONT, font_size=FONT_SIZE, size=button_size_normal, bg_sprite=BUTTON_SPRITE, color=BUTTON_COLOR, hover_color=BUTTON_COLOR_HOVER)
@@ -104,12 +107,12 @@ for i, button in enumerate(main_menu_holder):
 
 
 
-
+# --------------------- DECK SPRITE INIT ----------------------------- #
 back_design_surface = pygame.image.load(GLOBAL().BACK_DESIGN_LOC).convert_alpha()
 back_design_surface = pygame.transform.smoothscale_by(back_design_surface, 0.5)
 
 card_count_font_obj = pygame.font.Font(GLOBAL().FONT_LOC, 32)
-
+# --------------------- VIGNETTE INIT ----------------------------- #
 VIGNETTE_FILE_LOC = "Game/Assets/General/Vignette.png"
 vignette_surf = pygame.image.load(VIGNETTE_FILE_LOC).convert_alpha()
 vignette_surf = pygame.transform.smoothscale(vignette_surf, [current_w, current_h]).convert_alpha()
@@ -162,7 +165,6 @@ while GLOBAL().running:
         screen.fill(main_screen_bg_color)
         # draw buttons
         for i, button in enumerate(main_menu_holder):
-            # button.set_pos([((current_w - button.size[0]) / 2), ((current_h - len(main_menu_holder) * (space + button.size[1])) / 2 + i * (space + button.size[1]))])
             button.update(screen)
 
 
@@ -179,18 +181,17 @@ while GLOBAL().running:
     # GAME
 
     # Makes sure there are enough cards:
-    if len(draw_deck) <= 5:
+    if len(draw_deck.deck) <= 5:
         # combine discard and draw deck and reshuffle
         draw_deck.add_cards(discard_deck.deck)
         discard_deck.deck.clear()
         draw_deck.shuffle_deck()
 
-
     if len(draw_deck) == 0:
         running = False
         print("IMPLEMENT FINISH CONDITION")
 
-    # Drawing the deck
+    # Drawing the draw deck
     r = None
     for i in range(len(draw_deck)):
         r = pygame.Rect([20, (current_h - Card.HEIGHT) / 2 - i, Card.WIDTH, Card.HEIGHT])
@@ -201,14 +202,20 @@ while GLOBAL().running:
         r = pygame.Rect([card_hover_rect.topleft[0] + Card.WIDTH / 2 - card_count_font_obj_s.size[0] / 2, card_hover_rect.topleft[1] + Card.HEIGHT / 2 - card_count_font_obj_s.size[1] / 2, card_count_font_obj_s.size[0], card_count_font_obj_s.size[1]])
         screen.blit(card_count_font_obj_s, GLOBAL().create_rect(r))
 
+    # Checking if clicked the button
     if clicked_button and not is_bogey_turn:
-        discard_deck.add_cards(in_hand.deck.copy())
+        not_selected = [].copy()
+        not_selected.clear()
+        for c in in_hand.deck:
+            if c not in save_deck:
+                not_selected.append(c)
+        discard_deck.add_cards(not_selected.copy())
         in_hand.clear()
         in_hand.add_card(draw_deck.draw_card())
         is_bogey_turn = True
 
 
-    # Draw cards up to 5
+    # Draw cards and checking if the bogey has finished the turn
     if is_bogey_turn:
         if len(in_hand) == 0:
             is_bogey_turn = False
@@ -235,6 +242,8 @@ while GLOBAL().running:
 
     if GLOBAL().is_card_active:
         is_card_in_vicinity = vicinity_rect.colliderect(GLOBAL().get_current().get_rect())
+    else:
+        is_card_in_vicinity = True
 
     poses = in_hand.draw_deck([current_w // 2 - (Card.WIDTH + space) * in_hand.get_len_not_active() * 0.5, current_h - 300], space, skip=not is_card_in_vicinity)
     for i in range(len(in_hand)):

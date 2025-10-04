@@ -130,7 +130,7 @@ class Deck:
         self.deck = []
 
     def remove(self, index: int):
-        self.deck.remove(self.deck[index])
+        self.deck.pop(index)
 
     def add_cards(self, cards: list[Card]):
         self.deck.extend(cards)
